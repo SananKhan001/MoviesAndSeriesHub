@@ -9,7 +9,6 @@ import java.util.Date;
 import java.util.List;
 
 @Data
-@Setter
 @ToString
 @Builder
 @AllArgsConstructor
@@ -24,6 +23,11 @@ public class Viewer {
 
     @Column(name = "viewer_name", nullable = false)
     private String name;
+
+    @OneToOne
+    @JoinColumn(name = "user_credentials")
+    @JsonIgnore
+    private User user;
 
     // uuid
     @Column(name = "unique_profile_id", nullable = false)

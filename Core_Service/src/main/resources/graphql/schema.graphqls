@@ -1,0 +1,24 @@
+input AdminCreateRequest{
+    name:String!,
+    username:String!,
+    password:String!,
+}
+
+input ViewerCreateRequest{
+    name:String!,
+    username:String!,
+    password:String!,
+}
+
+type UserResponse{
+    userId:ID!,
+    name:String!,
+    username:String!,
+    profileURL:String!,
+    authority:String!
+}
+
+
+
+
+

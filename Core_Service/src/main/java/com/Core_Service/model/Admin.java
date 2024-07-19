@@ -1,5 +1,6 @@
 package com.Core_Service.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
@@ -7,7 +8,6 @@ import org.hibernate.annotations.CreationTimestamp;
 import java.util.Date;
 
 @Data
-@Setter
 @ToString
 @Builder
 @AllArgsConstructor
@@ -23,6 +23,14 @@ public class Admin {
 
     @Column(name = "admin_name", unique = true, nullable = false)
     private String name;
+
+    @Column(name = "unique_profile_id", nullable = false)
+    private String uniqueProfileId;
+
+    @OneToOne
+    @JoinColumn(name = "user_credentials")
+    @JsonIgnore
+    private User user;
 
     @CreationTimestamp
     @Column(name = "joined_on")
