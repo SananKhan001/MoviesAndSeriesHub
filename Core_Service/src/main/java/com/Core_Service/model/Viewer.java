@@ -21,7 +21,7 @@ public class Viewer {
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
 
-    @Column(name = "viewer_name", nullable = false)
+    @Column(name = "viewer_name", nullable = false, unique = true)
     private String name;
 
     @OneToOne

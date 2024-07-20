@@ -11,14 +11,34 @@ input ViewerCreateRequest{
 }
 
 type UserResponse{
-    userId:ID!,
-    name:String!,
-    username:String!,
-    profileURL:String!,
-    authority:String!
+    userId:ID,
+
+    name:String,
+    username:String,
+    profileURL:String,
+    authority:String
 }
 
+type Mutation{
+    signUpAdmin(adminCreateRequest:AdminCreateRequest!):UserResponse
+    signUpViewer(viewerCreateRequest:ViewerCreateRequest!):UserResponse
+}
 
+type Query{
+    ##
+    # APIs related to READ USERS
+    # Only Accessible by ADMIN
+    ##
+    allViewersInReverse(page:Int = 0, size:Int = 2):[UserResponse]
+    findViewerByUserId(userId:ID!):UserResponse
+    allAdminsInReverse(page:Int = 0, size:Int = 2):[UserResponse]
+    findAdminsByUserId(userId:ID!):UserResponse
 
-
-
+    ##
+    # APIs to access currently loggedin user's details
+    ##
+    ## Accessible by VIEWER
+    currentViewerDetails:UserResponse
+    ## Accessible by ADMIN
+    currentAdminDetails:UserResponse
+}

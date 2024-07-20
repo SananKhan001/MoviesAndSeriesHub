@@ -37,11 +37,11 @@ public class User implements UserDetails {
     @Column(name = "authority", nullable = false)
     private String authority;
 
-    @OneToOne(mappedBy = "user_credentials", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToOne(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     @JsonIgnore
     private Admin admin;
 
-    @OneToOne(mappedBy = "user_credentials", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToOne(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     @JsonIgnore
     private Viewer viewer;
 

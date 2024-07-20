@@ -5,6 +5,8 @@ import com.Core_Service.model.User;
 import com.Core_Service.model_request.UserCreateRequest;
 import com.Core_Service.model_response.UserResponse;
 import com.Core_Service.repository.UserRepository;
+import lombok.AllArgsConstructor;
+import lombok.NoArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -12,6 +14,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.provisioning.UserDetailsManager;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Optional;
 
@@ -25,6 +28,7 @@ public class UserService implements UserDetailsManager {
     @Autowired
     private PasswordEncoder passwordEncoder;
 
+    @Transactional
     public User createUser(UserCreateRequest userCreateRequest) {
         User.UserBuilder userBuilder = User.builder()
                 .username(userCreateRequest.getUsername())
