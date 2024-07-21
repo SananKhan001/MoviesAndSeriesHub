@@ -1,14 +1,18 @@
 package com.Core_Service.service;
 
+import com.Core_Service.config_jwt.JwtHelper;
 import com.Core_Service.enums.Authorities;
 import com.Core_Service.model.User;
+import com.Core_Service.model_request.JWTRequest;
 import com.Core_Service.model_request.UserCreateRequest;
+import com.Core_Service.model_response.JWTResponse;
 import com.Core_Service.model_response.UserResponse;
 import com.Core_Service.repository.UserRepository;
 import lombok.AllArgsConstructor;
 import lombok.NoArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.provisioning.UserDetailsManager;
