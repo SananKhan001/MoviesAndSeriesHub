@@ -1,6 +1,6 @@
 package com.Core_Service.service;
 
-import com.Core_Service.custom_exceptions.NoUserFound;
+import com.Core_Service.custom_exceptions.NoUserFoundException;
 import com.Core_Service.helpers.Helper;
 import com.Core_Service.model.Admin;
 import com.Core_Service.model.User;
@@ -48,9 +48,9 @@ public class AdminService {
                 .stream().map(x -> x.getUser().to(x)).collect(Collectors.toList());
     }
 
-    public UserResponse findById(Long userId) throws NoUserFound {
+    public UserResponse findById(Long userId) throws NoUserFoundException {
         Admin admin = adminRepository.findById(userId)
-                .orElseThrow(() -> new NoUserFound("No Admin Found With Provided Id !!!"));
+                .orElseThrow(() -> new NoUserFoundException("No Admin Found With Provided Id !!!"));
         return admin.getUser().to(admin);
     }
 

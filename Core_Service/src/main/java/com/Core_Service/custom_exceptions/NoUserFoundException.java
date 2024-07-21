@@ -2,8 +2,8 @@ package com.Core_Service.custom_exceptions;
 
 import java.util.function.Supplier;
 
-public class NoUserFound extends Exception {
-    public NoUserFound(String message){
+public class NoUserFoundException extends Exception {
+    public NoUserFoundException(String message){
         super(message);
     }
 }

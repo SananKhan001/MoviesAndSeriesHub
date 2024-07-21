@@ -10,6 +10,13 @@ input ViewerCreateRequest{
     password:String!,
 }
 
+input MovieCreateRequest{
+    name:String!,
+    genre:String!,
+    description:String!,
+    price:Int!
+}
+
 input JWTRequest{
     username:String!,
     password:String!
@@ -28,9 +35,21 @@ type UserResponse{
     authority:String
 }
 
+type MovieResponse{
+    movieId:ID!,
+    name:String!,
+    genre:String!,
+    description:String!,
+    posterURL:String!,
+    price:Int!,
+    rating:Int!,
+    createdAt:String!
+}
+
 type Mutation{
     signUpAdmin(adminCreateRequest:AdminCreateRequest!):UserResponse
     signUpViewer(viewerCreateRequest:ViewerCreateRequest!):UserResponse
+    addMovie(movieCreateRequest:MovieCreateRequest!):MovieResponse
 }
 
 type Query{

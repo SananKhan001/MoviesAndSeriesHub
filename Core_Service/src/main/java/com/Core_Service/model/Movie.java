@@ -1,6 +1,7 @@
 package com.Core_Service.model;
 
 import com.Core_Service.enums.Genre;
+import com.Core_Service.model_response.MovieResponse;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
@@ -43,7 +44,7 @@ public class Movie {
     private List<Review> reviews;
 
     @Column(name = "overall_rating", nullable = true)
-    private int rating;
+    private Integer rating;
 
     @ManyToMany
     @JsonIgnore
@@ -61,4 +62,13 @@ public class Movie {
     @CreationTimestamp
     @Column(name = "created_at")
     private Date createdAt;
+
+    public MovieResponse to(){
+        return MovieResponse.builder().movieId(this.id).description(this.description)
+                .genre(this.genre).posterURL(this.uniquePosterId)
+                .name(this.name).price(this.price).rating(
+                        this.rating != null ? this.rating : -1
+                )
+                .createdAt(this.createdAt.toString()).build();
+    }
 }

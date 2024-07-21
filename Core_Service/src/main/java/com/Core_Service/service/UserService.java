@@ -2,6 +2,7 @@ package com.Core_Service.service;
 
 import com.Core_Service.config_jwt.JwtHelper;
 import com.Core_Service.enums.Authorities;
+import com.Core_Service.enums.Genre;
 import com.Core_Service.model.User;
 import com.Core_Service.model_request.JWTRequest;
 import com.Core_Service.model_request.UserCreateRequest;
@@ -75,8 +76,7 @@ public class UserService implements UserDetailsManager {
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
         // TODO:: user should first load from cache
-        Optional<User> optionalUser = userRepository.findByUsername(username);
-        if(!optionalUser.isEmpty()) return optionalUser.get();
-        throw new UsernameNotFoundException("There are no user with provided username");
+        return userRepository.findByUsername(username)
+                .orElseThrow(() -> new UsernameNotFoundException("There are no user with provided username"));
     }
 }

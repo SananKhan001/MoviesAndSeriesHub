@@ -43,7 +43,7 @@ public class Series {
     private List<Review> reviews;
 
     @Column(name = "overall_rating", nullable = true)
-    private int rating;
+    private Integer rating;
 
     @ManyToMany
     @JsonIgnore

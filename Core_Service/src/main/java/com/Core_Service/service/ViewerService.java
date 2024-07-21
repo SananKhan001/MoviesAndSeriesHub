@@ -1,6 +1,6 @@
 package com.Core_Service.service;
 
-import com.Core_Service.custom_exceptions.NoUserFound;
+import com.Core_Service.custom_exceptions.NoUserFoundException;
 import com.Core_Service.helpers.Helper;
 import com.Core_Service.model.User;
 import com.Core_Service.model.Viewer;
@@ -46,9 +46,9 @@ public class ViewerService {
                 .stream().map(x -> x.getUser().to(x)).collect(Collectors.toList());
     }
 
-    public UserResponse findById(Long userId) throws NoUserFound {
+    public UserResponse findById(Long userId) throws NoUserFoundException {
         Viewer viewer = viewerRepository.findById(userId)
-                        .orElseThrow(() -> new NoUserFound("No Viewer Found With Provided Id !!!"));
+                        .orElseThrow(() -> new NoUserFoundException("No Viewer Found With Provided Id !!!"));
         return viewer.getUser().to(viewer);
     }
 

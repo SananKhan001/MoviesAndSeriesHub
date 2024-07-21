@@ -1,6 +1,6 @@
 package com.Core_Service.controller;
 
-import com.Core_Service.custom_exceptions.NoUserFound;
+import com.Core_Service.custom_exceptions.NoUserFoundException;
 import com.Core_Service.model_response.UserResponse;
 import com.Core_Service.service.AdminService;
 import com.Core_Service.service.ViewerService;
@@ -40,7 +40,7 @@ public class AdminController {
     @QueryMapping(name = "findAdminsByUserId")
     public UserResponse findAdminsByUserId(    @Argument
                                                @NotNull(message = "userId should not be negative")
-                                               Long userId) throws NoUserFound {
+                                               Long userId) throws NoUserFoundException {
         return adminService.findById(userId);
     }
 
@@ -58,7 +58,7 @@ public class AdminController {
     @QueryMapping(name = "findViewerByUserId")
     public UserResponse findViewerByUserId(    @Argument
                                                @NotNull(message = "userId should not be negative")
-                                               Long userId) throws NoUserFound {
+                                               Long userId) throws NoUserFoundException {
         return viewerService.findById(userId);
     }
 
