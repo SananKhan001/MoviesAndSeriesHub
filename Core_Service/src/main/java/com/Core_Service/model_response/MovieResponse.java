@@ -2,8 +2,6 @@ package com.Core_Service.model_response;
 
 import lombok.Builder;
 
-import java.util.Date;
-
 @Builder
 public class MovieResponse {
     private Long movieId;

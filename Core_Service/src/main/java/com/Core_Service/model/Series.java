@@ -1,6 +1,5 @@
 package com.Core_Service.model;
 
-import com.Core_Service.enums.Genre;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
@@ -38,14 +37,14 @@ public class Series {
     @Column(name = "series_price", nullable = false)
     private int price;
 
-    @OneToMany(mappedBy = "reviewForSeries", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "reviewForSeries", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
     @JsonIgnore
     private List<Review> reviews;
 
     @Column(name = "overall_rating", nullable = true)
     private Integer rating;
 
-    @ManyToMany
+    @ManyToMany(fetch = FetchType.LAZY)
     @JsonIgnore
     @JoinTable(
             name = "series-viewer-mapping",
@@ -54,7 +53,7 @@ public class Series {
     )
     private List<Viewer> viewers;
 
-    @OneToMany(mappedBy = "belongsToSeries", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "belongsToSeries", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
     @JsonIgnore
     private List<Episode> episode;
 

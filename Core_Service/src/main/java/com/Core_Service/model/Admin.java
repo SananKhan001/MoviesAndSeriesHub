@@ -27,7 +27,7 @@ public class Admin {
     @Column(name = "unique_profile_id", nullable = false)
     private String uniqueProfileId;
 
-    @OneToOne
+    @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_credentials")
     @JsonIgnore
     private User user;

@@ -20,7 +20,7 @@ public class Review {
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JsonIgnore
     @JoinColumn(name = "viewer")
     private Viewer viewer;
@@ -31,12 +31,12 @@ public class Review {
     @Column(name = "rating", nullable = false)
     private int rating;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JsonIgnore
     @JoinColumn(name = "review_for_movie")
     private Movie reviewForMovie;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JsonIgnore
     @JoinColumn(name = "review_for_series")
     private Series reviewForSeries;

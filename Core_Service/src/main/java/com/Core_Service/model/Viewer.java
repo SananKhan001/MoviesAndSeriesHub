@@ -24,7 +24,7 @@ public class Viewer {
     @Column(name = "viewer_name", nullable = false, unique = true)
     private String name;
 
-    @OneToOne
+    @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_credentials")
     @JsonIgnore
     private User user;
@@ -33,15 +33,15 @@ public class Viewer {
     @Column(name = "unique_profile_id", nullable = false)
     private String uniqueProfileId;
 
-    @ManyToMany(mappedBy = "viewers", cascade = CascadeType.ALL)
+    @ManyToMany(mappedBy = "viewers", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     @JsonIgnore
     private List<Movie> purchasedMovies;
 
-    @ManyToMany(mappedBy = "viewers", cascade = CascadeType.ALL)
+    @ManyToMany(mappedBy = "viewers", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     @JsonIgnore
     private List<Series> purchasedSeries;
 
-    @OneToMany(mappedBy = "viewer", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "viewer", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
     @JsonIgnore
     private List<Review> reviewList;
 

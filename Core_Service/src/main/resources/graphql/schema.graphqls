@@ -46,33 +46,59 @@ type MovieResponse{
     createdAt:String!
 }
 
+type EpisodeResponse {
+    episodeId:ID!,
+    episodeName:String!,
+    idInStreamDB:String!,
+    posterURL:String!,
+    createdAt:String!
+}
+
 type Mutation{
+    # To create an ADMIN-ACCOUNT [Accessible by EVERYONE]
     signUpAdmin(adminCreateRequest:AdminCreateRequest!):UserResponse
+    # To create a VIEWER-ACCOUNT [Only accessible by VIEWER]
     signUpViewer(viewerCreateRequest:ViewerCreateRequest!):UserResponse
+    # To perform ADD operation on movies [Only accessible by ADMIN]
     addMovie(movieCreateRequest:MovieCreateRequest!):MovieResponse
+    # To perform UPDATE operation on movies [Only accessible by ADMIN]
+    updateMovie(movieCreateRequest:MovieCreateRequest!, movieId:ID!):MovieResponse
+    # To perform DELETE operation on a movie [Only accessible by ADMIN]
+    deleteMovie(movieId:ID!):Boolean
+
+    # To ADD a episode in a movie
+    createEpisodeForMovie(episodeName:String!, movieId:ID!):EpisodeResponse
+    # To UPDATE a episode
+    updateEpisodeName(episodeName:String!, episodeId:ID!):EpisodeResponse
+    # To DELETE a episode
+    deleteEpisode(episodeId:ID!):Boolean
 }
 
 type Query{
-    ##
-    # APIs related to READ USERS
-    # Only Accessible by ADMIN
-    ##
+    # To fetch all VIEWER in reverse of their creation date [Only accessible by ADMIN]
     allViewersInReverse(page:Int = 0, size:Int = 2):[UserResponse]
+    # To fetch VIEWER by id [Only accessible by ADMIN]
     findViewerByUserId(userId:ID!):UserResponse
+    # To fetch all ADMIN in reverse of their creation date [Only accessible by ADMIN]
     allAdminsInReverse(page:Int = 0, size:Int = 2):[UserResponse]
+    # To fetch ADMIN by id [Only accessible by ADMIN]
     findAdminsByUserId(userId:ID!):UserResponse
 
-    ##
-    # APIs to access currently loggedin user's details
-    ##
-    ## Accessible by VIEWER
+    # To access currently loggedin VIEWER details [Only accessible by VIEWER]
     currentViewerDetails:UserResponse
-    ## Accessible by ADMIN
+    # To access currently loggedin ADMIN details [Only accessible by ADMIN]
     currentAdminDetails:UserResponse
 
-    ##
-    # API to login
-    ##
-    ## Accessible by Everyone
+    # To login and get JWT token [Accessible by EVERYONE]
     login(credentials:JWTRequest!):JWTResponse
+
+    # To perform GET operation on a movie [Accessible by EVERYONE]
+    getMovieById(movieId:ID!):MovieResponse
+    # To GET all new released movies [Accessible by EVERYONE]
+    getNewReleaseMoviesByGenre(genre:String!, page:Int = 0, size:Int = 2):[MovieResponse]
+
+    # To GET a episode by ID
+    getEpisodeById(episodeId:ID!):EpisodeResponse
+    # TO GET episode of a movie
+    getEpisodeByMovieId(movieId:ID!):EpisodeResponse
 }

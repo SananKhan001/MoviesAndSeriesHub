@@ -1,6 +1,5 @@
 package com.Core_Service.model;
 
-import com.Core_Service.enums.Genre;
 import com.Core_Service.model_response.MovieResponse;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
@@ -39,14 +38,14 @@ public class Movie {
     @Column(name = "movie_price", nullable = false)
     private int price;
 
-    @OneToMany(mappedBy = "reviewForMovie", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "reviewForMovie", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
     @JsonIgnore
     private List<Review> reviews;
 
     @Column(name = "overall_rating", nullable = true)
     private Integer rating;
 
-    @ManyToMany
+    @ManyToMany(fetch = FetchType.LAZY)
     @JsonIgnore
     @JoinTable(
             name = "movie-viewer-mapping",
@@ -55,7 +54,7 @@ public class Movie {
     )
     private List<Viewer> viewers;
 
-    @OneToOne(mappedBy = "belongsToMovie", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToOne(mappedBy = "belongsToMovie", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
     @JsonIgnore
     private Episode episode;
 
@@ -69,6 +68,7 @@ public class Movie {
                 .name(this.name).price(this.price).rating(
                         this.rating != null ? this.rating : -1
                 )
-                .createdAt(this.createdAt.toString()).build();
+                .createdAt(this.createdAt.toString())
+                .build();
     }
 }

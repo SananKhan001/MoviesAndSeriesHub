@@ -1,12 +1,12 @@
 package com.Core_Service.model;
 
+import com.Core_Service.model_response.EpisodeResponse;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
 
 import java.util.Date;
-import java.util.List;
 
 @Data
 @ToString
@@ -32,12 +32,12 @@ public class Episode {
     @Column(name = "unique_poster_id", nullable = false)
     private String uniquePosterId;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JsonIgnore
     @JoinColumn(name = "belongs_to_series")
     private Series belongsToSeries;
 
-    @OneToOne
+    @OneToOne(fetch = FetchType.LAZY)
     @JsonIgnore
     @JoinColumn(name = "belongs_to_movie")
     private Movie belongsToMovie;
@@ -45,4 +45,10 @@ public class Episode {
     @CreationTimestamp
     @Column(name = "created_at")
     private Date createdAt;
+
+    public EpisodeResponse to(){
+        return EpisodeResponse.builder().episodeId(this.id)
+                .episodeName(this.episodeName).idInStreamDB(this.episodeId)
+                .posterURL(this.uniquePosterId).createdAt(this.createdAt.toString()).build();
+    }
 }
