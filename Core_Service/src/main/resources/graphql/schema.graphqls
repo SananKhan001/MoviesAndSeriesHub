@@ -17,6 +17,13 @@ input MovieCreateRequest{
     price:Int!
 }
 
+input SeriesCreateRequest {
+    name:String!,
+    genre:String!,
+    description:String!,
+    price:Int!
+}
+
 input JWTRequest{
     username:String!,
     password:String!
@@ -54,6 +61,17 @@ type EpisodeResponse {
     createdAt:String!
 }
 
+type SeriesResponse {
+    seriesId:ID!,
+    name:String!,
+    genre:String!,
+    description:String!,
+    posterURL:String!,
+    price:Int!,
+    rating:Int!
+    createdAt:String!
+}
+
 type Mutation{
     # To create an ADMIN-ACCOUNT [Accessible by EVERYONE]
     signUpAdmin(adminCreateRequest:AdminCreateRequest!):UserResponse
@@ -66,12 +84,21 @@ type Mutation{
     # To perform DELETE operation on a movie [Only accessible by ADMIN]
     deleteMovie(movieId:ID!):Boolean
 
-    # To ADD a episode in a movie
+    # To ADD a episode in a movie [Only accessible by ADMIN]
     createEpisodeForMovie(episodeName:String!, movieId:ID!):EpisodeResponse
-    # To UPDATE a episode
+    # TO ADD a episode in a series // TODO:: Complete this api
+    addEpisodeInSeries(episodeName:String!, seriesId:ID!):EpisodeResponse
+    # To UPDATE a episode [Only accessible by ADMIN]
     updateEpisodeName(episodeName:String!, episodeId:ID!):EpisodeResponse
-    # To DELETE a episode
+    # To DELETE a episode [Only accessible by ADMIN]
     deleteEpisode(episodeId:ID!):Boolean
+
+    # To ADD a series
+    addSeries(seriesCreateRequest:SeriesCreateRequest!):SeriesResponse
+    # To UPDATE a series
+    updateSeries(seriesCreateRequest:SeriesCreateRequest!, seriesId:ID!):SeriesResponse
+    # To DELETE a series
+    deleteSeries(seriesId:ID!):Boolean
 }
 
 type Query{
@@ -97,8 +124,13 @@ type Query{
     # To GET all new released movies [Accessible by EVERYONE]
     getNewReleaseMoviesByGenre(genre:String!, page:Int = 0, size:Int = 2):[MovieResponse]
 
-    # To GET a episode by ID
+    # To GET a episode by ID [Accessible by EVERYONE]
     getEpisodeById(episodeId:ID!):EpisodeResponse
-    # TO GET episode of a movie
+    # TO GET episode of a movie [Accessible by EVERYONE]
     getEpisodeByMovieId(movieId:ID!):EpisodeResponse
+
+    # To GET a series by ID
+    getSeriesById(seriesId:ID!):SeriesResponse
+    # To GET all new released movies // TODO:: Complete this api
+    # TO GET episodes of a series // TODO:: Complete this api
 }

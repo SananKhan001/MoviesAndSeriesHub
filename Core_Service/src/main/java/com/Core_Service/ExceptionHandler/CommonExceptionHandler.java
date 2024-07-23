@@ -1,9 +1,6 @@
 package com.Core_Service.ExceptionHandler;
 
-import com.Core_Service.custom_exceptions.NoEpisodeFoundException;
-import com.Core_Service.custom_exceptions.NoMovieFoundException;
-import com.Core_Service.custom_exceptions.NoUserFoundException;
-import com.Core_Service.custom_exceptions.SessionExpiredException;
+import com.Core_Service.custom_exceptions.*;
 import graphql.GraphQLError;
 import org.springframework.graphql.data.method.annotation.GraphQlExceptionHandler;
 import org.springframework.validation.BindException;
@@ -48,6 +45,11 @@ public class CommonExceptionHandler {
 
     @GraphQlExceptionHandler(NoEpisodeFoundException.class)
     public GraphQLError NoEpisodeFoundExceptionHandler(NoEpisodeFoundException ex){
+        return GraphQLError.newError().message(ex.getMessage()).build();
+    }
+
+    @GraphQlExceptionHandler(NoSeriesFoundException.class)
+    public GraphQLError NoSeriesFoundExceptionHandler(NoSeriesFoundException ex){
         return GraphQLError.newError().message(ex.getMessage()).build();
     }
 }

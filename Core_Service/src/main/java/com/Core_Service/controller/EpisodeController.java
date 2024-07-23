@@ -4,12 +4,14 @@ import com.Core_Service.custom_exceptions.NoEpisodeFoundException;
 import com.Core_Service.custom_exceptions.NoMovieFoundException;
 import com.Core_Service.model_response.EpisodeResponse;
 import com.Core_Service.service.EpisodeService;
+import jakarta.annotation.security.PermitAll;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.graphql.data.method.annotation.Argument;
 import org.springframework.graphql.data.method.annotation.MutationMapping;
 import org.springframework.graphql.data.method.annotation.QueryMapping;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
@@ -18,6 +20,7 @@ public class EpisodeController {
     @Autowired
     private EpisodeService episodeService;
 
+    @PreAuthorize("hasAuthority('ADMIN')")
     @MutationMapping(name = "createEpisodeForMovie")
     public EpisodeResponse createEpisodeForMovie(@Argument
                                                  @NotNull(message = "Episode Name should not be null !!!")
@@ -29,6 +32,7 @@ public class EpisodeController {
         return episodeService.createEpisodeForMovie(episodeName, movieId);
     }
 
+    @PermitAll
     @QueryMapping(name = "getEpisodeById")
     public EpisodeResponse getEpisodeById(@Argument
                                           @NotNull(message = "EpisodeId should not be null !!!")
@@ -36,6 +40,7 @@ public class EpisodeController {
         return episodeService.getEpisodeById(episodeId);
     }
 
+    @PermitAll
     @QueryMapping(name = "getEpisodeByMovieId")
     public EpisodeResponse getEpisodeByMovieId(@Argument
                                                @NotNull(message = "MovieId should not be null !!!")
@@ -43,6 +48,7 @@ public class EpisodeController {
         return episodeService.getEpisodeByMovieId(movieId);
     }
 
+    @PreAuthorize("hasAuthority('ADMIN')")
     @MutationMapping(name = "updateEpisodeName")
     EpisodeResponse updateEpisodeName(@Argument
                                       @NotNull(message = "EpisodeName should not be null !!!")
@@ -53,7 +59,7 @@ public class EpisodeController {
                                       Long episodeId) throws NoEpisodeFoundException {
         return episodeService.updateEpisodeName(episodeName, episodeId);
     }
-
+    @PreAuthorize("hasAuthority('ADMIN')")
     @MutationMapping(name = "deleteEpisode")
     public Boolean deleteEpisode(   @Argument
                                     @NotNull(message = "Episode Id should not be null !!!")

@@ -7,9 +7,9 @@ import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 
 @Data
-public class MovieCreateRequest {
-    @NotNull(message = "Movie name should not be null")
-    @NotEmpty(message = "Movie name should not be empty")
+public class SeriesCreateRequest {
+    @NotNull(message = "Series name should not be null")
+    @NotEmpty(message = "Series name should not be empty")
     private String name;
     @NotNull(message = "Genre should not be empty")
     private Genre genre;

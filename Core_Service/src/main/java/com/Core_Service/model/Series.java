@@ -1,5 +1,6 @@
 package com.Core_Service.model;
 
+import com.Core_Service.model_response.SeriesResponse;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
@@ -41,7 +42,7 @@ public class Series {
     @JsonIgnore
     private List<Review> reviews;
 
-    @Column(name = "overall_rating", nullable = true)
+    @Column(name = "overall_rating")
     private Integer rating;
 
     @ManyToMany(fetch = FetchType.LAZY)
@@ -60,4 +61,13 @@ public class Series {
     @CreationTimestamp
     @Column(name = "created_at")
     private Date createdAt;
+
+    public SeriesResponse to(){
+        return SeriesResponse.builder().seriesId(this.id)
+                .name(this.name).genre(this.genre)
+                .description(this.description).posterURL(this.uniquePosterId)
+                .price(this.price).rating(this.rating == null ? -1 : this.rating)
+                .createdAt(this.createdAt.toString())
+                .build();
+    }
 }
