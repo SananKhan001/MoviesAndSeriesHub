@@ -2,13 +2,19 @@ package com.Core_Service.service;
 
 import com.Core_Service.custom_exceptions.NoEpisodeFoundException;
 import com.Core_Service.custom_exceptions.NoMovieFoundException;
+import com.Core_Service.custom_exceptions.NoSeriesFoundException;
 import com.Core_Service.helpers.Helper;
 import com.Core_Service.model.Episode;
+import com.Core_Service.model.Series;
 import com.Core_Service.model_response.EpisodeResponse;
 import com.Core_Service.repository.EpisodeRepository;
 import com.Core_Service.repository.MovieRepository;
+import com.Core_Service.repository.SeriesRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 public class EpisodeService {
@@ -21,6 +27,9 @@ public class EpisodeService {
 
     @Autowired
     private MovieService movieService;
+
+    @Autowired
+    private SeriesRepository seriesRepository;
 
     public EpisodeResponse createEpisodeForMovie(String episodeName, Long movieId) {
         Episode episode = Episode.builder().episodeName(episodeName)
@@ -51,5 +60,23 @@ public class EpisodeService {
     public Boolean deleteEpisode(Long episodeId) {
         episodeRepository.deleteById(episodeId);
         return true;
+    }
+
+    public EpisodeResponse addEpisodeInSeries(String episodeName, Long seriesId) throws NoSeriesFoundException {
+        Series series = seriesRepository.findById(seriesId)
+                .orElseThrow(() -> new NoSeriesFoundException("No series found with given series id !!!"));
+        Episode episode = Episode.builder()
+                .episodeName(episodeName)
+                .episodeId(Helper.generateUUID())
+                .uniquePosterId(Helper.generateUUID())
+                .belongsToSeries(series)
+                .build();
+        return episodeRepository.save(episode).to();
+    }
+
+    public List<EpisodeResponse> getEpisodeBySeriesId(Long seriesId) {
+        return episodeRepository.findAllBySeriesId(seriesId)
+                .stream()
+                .map(x -> x.to()).collect(Collectors.toList());
     }
 }

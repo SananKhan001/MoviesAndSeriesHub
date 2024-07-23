@@ -1,17 +1,20 @@
 package com.Core_Service.controller;
 
 import com.Core_Service.custom_exceptions.NoSeriesFoundException;
+import com.Core_Service.enums.Genre;
 import com.Core_Service.model_request.SeriesCreateRequest;
-import com.Core_Service.model_response.EpisodeResponse;
 import com.Core_Service.model_response.SeriesResponse;
 import com.Core_Service.service.SeriesService;
-import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.graphql.data.method.annotation.Argument;
 import org.springframework.graphql.data.method.annotation.MutationMapping;
 import org.springframework.graphql.data.method.annotation.QueryMapping;
 import org.springframework.web.bind.annotation.RestController;
+
+import java.util.List;
 
 @RestController
 public class SeriesController {
@@ -44,13 +47,12 @@ public class SeriesController {
         return seriesService.deleteSeries(seriesId);
     }
 
-    @MutationMapping(name = "addEpisodeInSeries")
-    public EpisodeResponse addEpisodeInSeries(    @Argument
-                                                  @NotNull(message = "EpisodeName should not be null !!!")
-                                                  @NotEmpty(message = "EpisodeName should not be empty !!!")
-                                                  String episodeName,
-                                                  @NotEmpty(message = "SeriesId sould not be null !!!")
-                                                  Long seriesId) {
-        return seriesService.addEpisodeInSeries(episodeName, seriesId);
+    @QueryMapping(name = "getNewReleaseSeriesByGenre")
+    public List<SeriesResponse> getNewReleaseSeriesByGenre(@Argument
+                                                           @NotNull(message = "Genre should not be null !!!")
+                                                           Genre genre,
+                                                           @Argument int page, @Argument int size) {
+        Pageable pageRequest = PageRequest.of(page, size);
+        return seriesService.getNewReleaseSeriesByGenre(genre, pageRequest);
     }
 }
