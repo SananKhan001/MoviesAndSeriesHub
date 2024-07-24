@@ -5,6 +5,7 @@ import com.Core_Service.enums.Genre;
 import com.Core_Service.model_request.SeriesCreateRequest;
 import com.Core_Service.model_response.SeriesResponse;
 import com.Core_Service.service.SeriesService;
+import jakarta.annotation.security.PermitAll;
 import jakarta.validation.constraints.NotNull;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
@@ -12,6 +13,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.graphql.data.method.annotation.Argument;
 import org.springframework.graphql.data.method.annotation.MutationMapping;
 import org.springframework.graphql.data.method.annotation.QueryMapping;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
@@ -22,11 +24,13 @@ public class SeriesController {
     @Autowired
     private SeriesService seriesService;
 
+    @PreAuthorize("hasAuthority('ADMIN')")
     @MutationMapping(name = "addSeries")
     public SeriesResponse addSeries(@Argument SeriesCreateRequest seriesCreateRequest) {
         return seriesService.addSeries(seriesCreateRequest);
     }
 
+    @PermitAll
     @QueryMapping(name = "getSeriesById")
     public SeriesResponse getSeriesById(@Argument
                                         @NotNull(message = "SeriesId should not be null !!!")
@@ -34,6 +38,7 @@ public class SeriesController {
         return seriesService.getSeriesById(seriesId);
     }
 
+    @PreAuthorize("hasAuthority('ADMIN')")
     @MutationMapping(name = "updateSeries")
     public SeriesResponse updateSeries(@Argument SeriesCreateRequest seriesCreateRequest,
                                        @Argument
@@ -42,11 +47,13 @@ public class SeriesController {
         return seriesService.updateSeries(seriesCreateRequest, seriesId);
     }
 
+    @PreAuthorize("hasAuthority('ADMIN')")
     @MutationMapping(name = "deleteSeries")
     public Boolean deleteSeries(@Argument @NotNull(message = "SeriesId should not be null !!!") Long seriesId){
         return seriesService.deleteSeries(seriesId);
     }
 
+    @PermitAll
     @QueryMapping(name = "getNewReleaseSeriesByGenre")
     public List<SeriesResponse> getNewReleaseSeriesByGenre(@Argument
                                                            @NotNull(message = "Genre should not be null !!!")

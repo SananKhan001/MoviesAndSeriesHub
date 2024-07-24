@@ -124,9 +124,9 @@ type Query{
     # To GET all new released movies [Accessible by EVERYONE]
     getNewReleaseMoviesByGenre(genre:String!, page:Int = 0, size:Int = 2):[MovieResponse]
 
-    # To GET a episode by ID [Accessible by EVERYONE]
+    # To GET a episode by ID [Accessible by VIEWER and ADMIN]
     getEpisodeById(episodeId:ID!):EpisodeResponse
-    # To GET episode of a movie [Accessible by EVERYONE]
+    # To GET episode of a movie [Accessible by VIEWER and ADMIN]
     getEpisodeByMovieId(movieId:ID!):EpisodeResponse
 
     # To GET a series by ID [Accessible by EVERYONE]

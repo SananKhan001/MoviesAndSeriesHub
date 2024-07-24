@@ -5,7 +5,6 @@ import com.Core_Service.custom_exceptions.NoMovieFoundException;
 import com.Core_Service.custom_exceptions.NoSeriesFoundException;
 import com.Core_Service.model_response.EpisodeResponse;
 import com.Core_Service.service.EpisodeService;
-import jakarta.annotation.security.PermitAll;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -35,7 +34,7 @@ public class EpisodeController {
         return episodeService.createEpisodeForMovie(episodeName, movieId);
     }
 
-    @PermitAll
+    @PreAuthorize("hasAnyAuthority('ADMIN', 'VIEWER')")
     @QueryMapping(name = "getEpisodeById")
     public EpisodeResponse getEpisodeById(@Argument
                                           @NotNull(message = "EpisodeId should not be null !!!")
@@ -43,7 +42,7 @@ public class EpisodeController {
         return episodeService.getEpisodeById(episodeId);
     }
 
-    @PermitAll
+    @PreAuthorize("hasAnyAuthority('ADMIN', 'VIEWER')")
     @QueryMapping(name = "getEpisodeByMovieId")
     public EpisodeResponse getEpisodeByMovieId(@Argument
                                                @NotNull(message = "MovieId should not be null !!!")
@@ -77,11 +76,12 @@ public class EpisodeController {
                                                   @NotEmpty(message = "EpisodeName should not be empty !!!")
                                                   String episodeName,
                                                   @Argument
-                                                  @NotNull(message = "SeriesId sould not be null !!!")
+                                                  @NotNull(message = "SeriesId should not be null !!!")
                                                   Long seriesId) throws NoSeriesFoundException {
         return episodeService.addEpisodeInSeries(episodeName, seriesId);
     }
 
+    @PreAuthorize("hasAnyAuthority('ADMIN', 'VIEWER')")
     @QueryMapping(name = "getEpisodesBySeriesId")
     List<EpisodeResponse> getEpisodesBySeriesId(@Argument @NotNull(message = "SeriesId should not be null !!!)") Long seriesId) {
         return episodeService.getEpisodeBySeriesId(seriesId);
