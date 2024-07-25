@@ -3,6 +3,6 @@ USE STREAM_DB;
 CREATE TABLE user_details (
     id BIGINT PRIMARY KEY,
     authority VARCHAR(255) NOT NULL,
-    -- password VARCHAR(255) NOT NULL,
+    password VARCHAR(255) NOT NULL,
     gmail VARCHAR(255) NOT NULL UNIQUE
 );
