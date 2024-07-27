@@ -7,6 +7,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.ReactiveAuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.ReactiveUserDetailsService;
 import org.springframework.security.core.userdetails.UserDetails;
 import reactor.core.publisher.Mono;
@@ -34,6 +35,7 @@ public class AuthManager implements ReactiveAuthenticationManager {
                             Mono.error(new IllegalArgumentException("No user found in auth manager !!!"));
                         }
                         if(jwtHelper.validateToken(auth.getCredentials(), u)){
+                            SecurityContextHolder.getContext().setAuthentication(UsernamePasswordAuthenticationToken.authenticated(u.getUsername(), u.getPassword(), u.getAuthorities()));
                             return Mono.justOrEmpty(UsernamePasswordAuthenticationToken.authenticated(u.getUsername(), u.getPassword(), u.getAuthorities()));
                         }
                         Mono.error(new IllegalArgumentException("Invalid/Expired token !!!"));

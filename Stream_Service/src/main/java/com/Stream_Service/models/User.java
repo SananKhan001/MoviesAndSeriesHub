@@ -2,6 +2,8 @@ package com.Stream_Service.models;
 
 import lombok.*;
 import org.springframework.data.annotation.Id;
+import org.springframework.data.annotation.Transient;
+import org.springframework.data.domain.Persistable;
 import org.springframework.data.relational.core.mapping.Column;
 import org.springframework.data.relational.core.mapping.Table;
 import org.springframework.security.core.GrantedAuthority;
@@ -17,9 +19,10 @@ import java.util.stream.Collectors;
 @AllArgsConstructor
 @NoArgsConstructor
 @Table(name = "user_details")
-public class User implements UserDetails {
+public class User implements UserDetails, Persistable<Long>{
     private static final String AUTHORITY_DELIMETER = ":";
 
+    @Id
     @Column("id")
     private Long id;
 
@@ -31,6 +34,9 @@ public class User implements UserDetails {
 
     @Column("authority")
     private String authority;
+
+    @Transient
+    private boolean isNew;
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
@@ -59,5 +65,10 @@ public class User implements UserDetails {
     @Override
     public boolean isEnabled() {
         return true;
+    }
+
+    @Override
+    public boolean isNew() {
+        return this.isNew;
     }
 }

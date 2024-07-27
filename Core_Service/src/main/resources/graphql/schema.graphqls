@@ -99,6 +99,9 @@ type Mutation{
     updateSeries(seriesCreateRequest:SeriesCreateRequest!, seriesId:ID!):SeriesResponse
     # To DELETE a series [Only accessible by ADMIN]
     deleteSeries(seriesId:ID!):Boolean
+
+    # To BUY a movie [Only accessible by VIEWER] TODO:: [REPAIR THIS DUMMY METHOD]
+    buyMovie(movieId:ID!):String
 }
 
 type Query{

@@ -10,7 +10,9 @@ import com.Core_Service.model_response.EpisodeResponse;
 import com.Core_Service.repository.EpisodeRepository;
 import com.Core_Service.repository.MovieRepository;
 import com.Core_Service.repository.SeriesRepository;
+import org.commonDTO.EpisodeCreationMessage;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cloud.stream.function.StreamBridge;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -31,11 +33,25 @@ public class EpisodeService {
     @Autowired
     private SeriesRepository seriesRepository;
 
+    @Autowired
+    private StreamBridge streamBridge;
+
     public EpisodeResponse createEpisodeForMovie(String episodeName, Long movieId) {
         Episode episode = Episode.builder().episodeName(episodeName)
                 .episodeId(Helper.generateUUID()).uniquePosterId(Helper.generateUUID())
                 .belongsToMovie(movieRepository.findById(movieId).get()).build();
-        return episodeRepository.save(episode).to();
+        episode = episodeRepository.save(episode);
+
+        /**                                  ------------------------------
+         *  EpisodeCreationMessage ======>>>| EpisodeCreationMessageTopic |
+         *                                  ------------------------------
+         */
+        EpisodeCreationMessage episodeCreationMessage = EpisodeCreationMessage.builder()
+                .id(episode.getId()).uniquePosterId(episode.getUniquePosterId())
+                .movieId(episode.getBelongsToMovie().getId()).isNew(true).build();
+        streamBridge.send("EpisodeCreationMessageTopic", episodeCreationMessage);
+
+        return episode.to();
     }
 
     public EpisodeResponse getEpisodeById(Long episodeId) throws NoEpisodeFoundException {
@@ -57,7 +73,16 @@ public class EpisodeService {
         return episodeRepository.save(episode).to();
     }
 
-    public Boolean deleteEpisode(Long episodeId) {
+    public Boolean deleteEpisode(Long episodeId) throws NoEpisodeFoundException {
+
+        /**                                  ------------------------------
+         *  EpisodeCreationMessage ======>>>| EpisodeDeletionMessageTopic |
+         *                                  ------------------------------
+         */
+        streamBridge.send("EpisodeDeletionMessageTopic", episodeRepository.findById(episodeId)
+                .orElseThrow(() -> new NoEpisodeFoundException("No episode found with given id !!!"))
+                .getUniquePosterId());
+
         episodeRepository.deleteById(episodeId);
         return true;
     }

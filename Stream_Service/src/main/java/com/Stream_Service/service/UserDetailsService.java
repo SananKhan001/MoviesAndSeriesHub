@@ -1,6 +1,5 @@
 package com.Stream_Service.service;
 
-import com.Stream_Service.custom_exceptions.NoUserFoundException;
 import com.Stream_Service.models.User;
 import com.Stream_Service.repository.UserRepository;
 import lombok.SneakyThrows;

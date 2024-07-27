@@ -65,7 +65,7 @@ public class EpisodeController {
     @MutationMapping(name = "deleteEpisode")
     public Boolean deleteEpisode(   @Argument
                                     @NotNull(message = "Episode Id should not be null !!!")
-                                    Long episodeId) {
+                                    Long episodeId) throws NoEpisodeFoundException {
         return episodeService.deleteEpisode(episodeId);
     }
 

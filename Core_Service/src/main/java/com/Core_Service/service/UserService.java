@@ -46,10 +46,9 @@ public class UserService implements UserDetailsManager {
          *                                ---------------------------
          */
         UserCreationMessage userCreationMessage = UserCreationMessage.builder()
-                .id(user.getId())
-                .username(user.getUsername())
+                .id(user.getId()).username(user.getUsername())
                 .password("Password Will Not Be Sent Anywhere !!!")
-                .authority(user.getAuthority()).build();
+                .authority(user.getAuthority()).isNew(true).build();
         streamBridge.send("UserCreationMessageTopic", userCreationMessage);
 
         return user;

@@ -1,2 +1,8 @@
+org/commonDTO/EpisodeCreationMessage.class
+org/commonDTO/SeriesBuyMessage.class
+org/commonDTO/MovieBuyMessage$MovieBuyMessageBuilder.class
+org/commonDTO/EpisodeCreationMessage$EpisodeCreationMessageBuilder.class
+org/commonDTO/SeriesBuyMessage$SeriesBuyMessageBuilder.class
 org/commonDTO/UserCreationMessage.class
+org/commonDTO/MovieBuyMessage.class
 org/commonDTO/UserCreationMessage$UserCreationMessageBuilder.class

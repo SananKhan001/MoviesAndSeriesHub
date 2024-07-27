@@ -67,4 +67,10 @@ public class MovieController {
         Pageable pageRequest = PageRequest.of(page, size);
         return movieService.getNewReleaseMoviesByGenre(genre.toString(), pageRequest);
     }
+
+    @PreAuthorize("hasAuthority('VIEWER')")
+    @MutationMapping(name = "buyMovie")
+    public String buyMovie(@Argument Long movieId) throws NoMovieFoundException {
+        return movieService.assignMovieToCurrentUser(movieId);
+    }
 }

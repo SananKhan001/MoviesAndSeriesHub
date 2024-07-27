@@ -7,10 +7,10 @@ import lombok.*;
 @ToString
 @AllArgsConstructor
 @NoArgsConstructor
-public class UserCreationMessage {
+public class EpisodeCreationMessage {
     private Long id;
-    private String username;
-    private String password;
-    private String authority;
+    private String uniquePosterId;
+    private Long movieId;
+    private Long seriesId;
     private boolean isNew;
 }

@@ -3,11 +3,13 @@ package com.Core_Service.service;
 import com.Core_Service.custom_exceptions.NoMovieFoundException;
 import com.Core_Service.helpers.Helper;
 import com.Core_Service.model.Movie;
+import com.Core_Service.model.User;
 import com.Core_Service.model_request.MovieCreateRequest;
 import com.Core_Service.model_response.MovieResponse;
 import com.Core_Service.repository.MovieRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Pageable;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -54,5 +56,21 @@ public class MovieService {
         return movieRepository.findNewReleaseMoviesByGenre(genre, pageRequest)
                 .stream()
                 .map(Movie::to).collect(Collectors.toList());
+    }
+
+    public String assignMovieToCurrentUser(Long movieId) throws NoMovieFoundException {
+        User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        Movie movie = movieRepository.findById(movieId)
+                .orElseThrow(() -> new NoMovieFoundException("No movie present with provided movie id !!!"));
+        movie.getViewers().add(user.getViewer());
+        movieRepository.save(movie);
+
+        // TODO:: Send movie buy message
+        /**                                ---------------------------
+         *  MovieCreationMessage ======>>> | UserCreationMessageTopic |
+         *                                ---------------------------
+         */
+
+        return "Bought movie successfully !!!";
     }
 }
