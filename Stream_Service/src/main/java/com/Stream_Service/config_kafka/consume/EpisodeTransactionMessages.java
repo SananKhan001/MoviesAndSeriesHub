@@ -1,4 +1,4 @@
-package com.Stream_Service.config_kafka;
+package com.Stream_Service.config_kafka.consume;
 
 import com.Stream_Service.service.EpisodeService;
 import org.commonDTO.EpisodeCreationMessage;
@@ -26,7 +26,6 @@ public class EpisodeTransactionMessages {
     @Bean
     public Consumer<EpisodeCreationMessage> episodeCreationMessage(){
         return episodeCreationMessage -> {
-            System.out.println("Got creation request");
             episodeService.createEpisode(episodeCreationMessage);
         };
     }
