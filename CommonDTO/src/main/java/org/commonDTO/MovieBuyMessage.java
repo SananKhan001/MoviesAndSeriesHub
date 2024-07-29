@@ -10,4 +10,5 @@ import lombok.*;
 public class MovieBuyMessage {
     private Long userId;
     private Long movieId;
+    private boolean isNew;
 }

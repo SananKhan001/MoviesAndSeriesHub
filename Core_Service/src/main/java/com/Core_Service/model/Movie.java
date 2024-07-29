@@ -48,7 +48,7 @@ public class Movie {
     @ManyToMany(fetch = FetchType.LAZY)
     @JsonIgnore
     @JoinTable(
-            name = "movie-viewer-mapping",
+            name = "movie_viewer_mapping",
             joinColumns = @JoinColumn(name = "movie_id", referencedColumnName = "id"),
             inverseJoinColumns = @JoinColumn(name = "viewer_id", referencedColumnName = "id")
     )

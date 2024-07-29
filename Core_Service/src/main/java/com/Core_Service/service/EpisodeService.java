@@ -96,7 +96,19 @@ public class EpisodeService {
                 .uniquePosterId(Helper.generateUUID())
                 .belongsToSeries(series)
                 .build();
-        return episodeRepository.save(episode).to();
+        episode = episodeRepository.save(episode);
+
+        /**                                  ------------------------------
+         *  EpisodeCreationMessage ======>>>| EpisodeCreationMessageTopic |
+         *                                  ------------------------------
+         */
+        streamBridge.send("EpisodeCreationMessageTopic",
+                            EpisodeCreationMessage.builder()
+                                    .id(episode.getId()).uniquePosterId(episode.getUniquePosterId())
+                                    .seriesId(episode.getBelongsToSeries().getId()).isNew(true).build()
+        );
+
+        return episode.to();
     }
 
     public List<EpisodeResponse> getEpisodeBySeriesId(Long seriesId) {

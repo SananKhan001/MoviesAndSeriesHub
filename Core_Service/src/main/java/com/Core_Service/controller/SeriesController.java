@@ -49,7 +49,7 @@ public class SeriesController {
 
     @PreAuthorize("hasAuthority('ADMIN')")
     @MutationMapping(name = "deleteSeries")
-    public Boolean deleteSeries(@Argument @NotNull(message = "SeriesId should not be null !!!") Long seriesId){
+    public Boolean deleteSeries(@Argument @NotNull(message = "SeriesId should not be null !!!") Long seriesId) throws NoSeriesFoundException {
         return seriesService.deleteSeries(seriesId);
     }
 
@@ -61,5 +61,11 @@ public class SeriesController {
                                                            @Argument int page, @Argument int size) {
         Pageable pageRequest = PageRequest.of(page, size);
         return seriesService.getNewReleaseSeriesByGenre(genre, pageRequest);
+    }
+
+    @PreAuthorize("hasAuthority('VIEWER')")
+    @MutationMapping(name = "buySeries")
+    public String buySeries(@Argument Long seriesId) throws NoSeriesFoundException {
+        return seriesService.assignSeriesToCurrentUser(seriesId);
     }
 }

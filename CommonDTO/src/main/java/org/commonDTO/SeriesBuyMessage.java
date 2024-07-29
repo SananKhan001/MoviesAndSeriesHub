@@ -10,4 +10,5 @@ import lombok.*;
 public class SeriesBuyMessage {
     private Long userId;
     private Long seriesId;
+    private boolean isNew;
 }

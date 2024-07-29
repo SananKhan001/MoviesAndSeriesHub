@@ -102,6 +102,9 @@ type Mutation{
 
     # To BUY a movie [Only accessible by VIEWER] TODO:: [REPAIR THIS DUMMY METHOD]
     buyMovie(movieId:ID!):String
+
+    # To BUY a series [Only accessible by VIEWER] TODO:: [REPAIR THIS DUMMY METHOD]
+    buySeries(seriesId:ID!):String
 }
 
 type Query{
