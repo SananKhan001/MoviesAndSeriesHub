@@ -13,10 +13,12 @@ CREATE TABLE episodes (
     belongs_to_series BIGINT
 );
 CREATE TABLE user_movie_mapping (
-	user_id BIGINT,
-    movie_id BIGINT
+    id BIGINT PRIMARY KEY AUTO_INCREMENT,
+	user_id BIGINT NOT NULL,
+    movie_id BIGINT NOT NULL
 );
 CREATE TABLE user_series_mapping (
-	user_id BIGINT,
-    series_id BIGINT
+    id BIGINT PRIMARY KEY AUTO_INCREMENT,
+	user_id BIGINT NOT NULL,
+    series_id BIGINT NOT NULL
 );

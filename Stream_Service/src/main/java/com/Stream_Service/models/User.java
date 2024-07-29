@@ -66,9 +66,4 @@ public class User implements UserDetails, Persistable<Long>{
     public boolean isEnabled() {
         return true;
     }
-
-    @Override
-    public boolean isNew() {
-        return this.isNew;
-    }
 }

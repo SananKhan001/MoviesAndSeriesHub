@@ -23,10 +23,7 @@ public class EpisodeService {
                 .movieId(episodeCreationMessage.getMovieId())
                 .seriesId(episodeCreationMessage.getSeriesId())
                 .isNew(episodeCreationMessage.isNew()).build();
-        episodeRepository.save(episodes)
-                .subscribe(eps -> {
-                    System.out.println(eps.getUniquePosterId());
-                });
+        episodeRepository.save(episodes).subscribe();
         return Mono.empty();
     }
 

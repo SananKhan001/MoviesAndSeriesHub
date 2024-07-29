@@ -29,12 +29,6 @@ public class Episodes implements Persistable<Long>{
 
     @Column("belongs_to_series")
     private Long seriesId; // bigint
-
     @Transient
     private boolean isNew;
-
-    @Override
-    public boolean isNew() {
-        return this.isNew;
-    }
 }

@@ -21,9 +21,7 @@ public class UserService {
                 .password(userCreationMessage.getPassword())
                 .authority(userCreationMessage.getAuthority())
                 .isNew(userCreationMessage.isNew()).build();
-        userRepository.save(user).subscribe(
-                u -> log.info("User created with id: {}", u.getId())
-        );
+        userRepository.save(user).subscribe();
         return Mono.empty();
     }
 }
