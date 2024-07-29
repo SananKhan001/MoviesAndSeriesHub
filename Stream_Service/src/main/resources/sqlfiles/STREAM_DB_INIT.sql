@@ -22,3 +22,8 @@ CREATE TABLE user_series_mapping (
 	user_id BIGINT NOT NULL,
     series_id BIGINT NOT NULL
 );
+CREATE TABLE media_files (
+    id BIGINT PRIMARY KEY AUTO_INCREMENT,
+    unique_id VARCHAR(255) NOT NULL UNIQUE,
+	file_path VARCHAR(255) NOT NULL UNIQUE
+);

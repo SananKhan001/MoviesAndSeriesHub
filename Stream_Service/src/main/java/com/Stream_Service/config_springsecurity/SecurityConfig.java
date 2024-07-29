@@ -32,7 +32,7 @@ public class SecurityConfig {
 //                        exchanges.pathMatchers("/login").permitAll();
                         exchanges.pathMatchers("/auth/viewer/**").hasAuthority(Authority.VIEWER.toString());
                         exchanges.pathMatchers("/auth/admin/**").hasAuthority(Authority.ADMIN.toString());
-                        exchanges.anyExchange().authenticated();
+                        exchanges.anyExchange().permitAll();
                     }
                 )
                 .addFilterAt(jwtFilter, SecurityWebFiltersOrder.AUTHENTICATION)
