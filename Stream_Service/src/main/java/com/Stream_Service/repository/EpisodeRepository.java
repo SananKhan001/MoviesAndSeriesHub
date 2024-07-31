@@ -11,4 +11,7 @@ import reactor.core.publisher.Mono;
 public interface EpisodeRepository extends ReactiveCrudRepository<Episodes, Long> {
     @Query("DELETE FROM episodes WHERE unique_poster_id = :uniquePosterId")
     Mono<Void> deleteByUniquePosterId(String uniquePosterId);
+
+    @Query("SELECT * FROM episodes WHERE unique_poster_id = :uniquePosterId")
+    Mono<Episodes> findByUniquePosterId(String uniquePosterId);
 }

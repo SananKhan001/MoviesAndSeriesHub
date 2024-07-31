@@ -6,6 +6,7 @@ import com.Stream_Service.enums.Authority;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.reactive.EnableWebFluxSecurity;
@@ -29,22 +30,18 @@ public class SecurityConfig {
         http
                 .authorizeExchange(exchanges ->
                     {
-//                        exchanges.pathMatchers("/login").permitAll();
-                        exchanges.pathMatchers("/auth/viewer/**").hasAuthority(Authority.VIEWER.toString());
-                        exchanges.pathMatchers("/auth/admin/**").hasAuthority(Authority.ADMIN.toString());
+                        exchanges.pathMatchers("/poster/upload/**", "/video/upload/**").hasAuthority(Authority.ADMIN.toString());
+                        exchanges.pathMatchers("/poster/get/**", "/profile/**", "/video/stream/**").authenticated();
+
                         exchanges.anyExchange().permitAll();
                     }
                 )
                 .addFilterAt(jwtFilter, SecurityWebFiltersOrder.AUTHENTICATION)
                 .httpBasic().disable()
                 .formLogin().disable()
+                .cors().disable()
                 .csrf().disable();
 
         return http.build();
     }
-
-//    @Bean
-//    public AuthenticationManager authenticationManager(AuthenticationConfiguration builder) throws Exception {
-//        return builder.getAuthenticationManager();
-//    }
 }

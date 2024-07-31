@@ -40,7 +40,6 @@ public class User implements UserDetails, Persistable<Long>{
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        System.out.println("Authority is checked !!! ");
         String[] authorities = this.authority.split(AUTHORITY_DELIMETER);
         return Arrays.stream(authorities)
                 .map(x -> new SimpleGrantedAuthority(x))

@@ -16,7 +16,6 @@ public class EpisodeService {
     private EpisodeRepository episodeRepository;
 
     public Mono<Void> createEpisode(EpisodeCreationMessage episodeCreationMessage) {
-        System.out.println("trying to create episode here !!!");
         Episodes episodes = Episodes.builder()
                 .id(episodeCreationMessage.getId())
                 .uniquePosterId(episodeCreationMessage.getUniquePosterId())
@@ -28,9 +27,7 @@ public class EpisodeService {
     }
 
     public Mono<Void> deleteEpisode(String uniquePosterId) {
-        log.info("deletion request for episode id - {}", uniquePosterId);
         episodeRepository.deleteByUniquePosterId(uniquePosterId).subscribe();
-        log.info("deletion executed");
         return Mono.empty();
     }
 }

@@ -22,7 +22,6 @@ public class UserDetailsService implements ReactiveUserDetailsService {
     @SneakyThrows
     @Override
     public Mono<UserDetails> findByUsername(String username) {
-        // TODO:: user should first load from cache
         Mono<User> user = userRepository.findByUsername(username);
         return user
                 .map(x -> x);

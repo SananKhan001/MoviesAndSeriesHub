@@ -9,19 +9,53 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.0/dist/css/bootstrap.min.css" rel="stylesheet"
           integrity="sha384-KyZXEAg3QhqLMpG8r+8fhAXLRk2vvoC2f3B09zVXn8CA5QIVfZOJ3BCsw2P0p/We" crossorigin="anonymous">
 
-    <title>Reactive Spring Video streaming</title>
+    <title>Reactive Spring Video Streaming</title>
 </head>
 <body>
 <div class="container mt-5">
-    <h2>Video streaming</h2>
-    <!--    <video src="/image/video/stream/ArhamKhan.mp4" width="720px" height="480px" controls preload="none">-->
-    <!--    </video>-->
-    <img src="http://localhost:9091/poster/get/posterId" width="720px" height="480px">
+    <h2>Video Streaming</h2>
+    <video id="videoPlayer" width="720px" height="480px" controls preload="none">
+        Your browser does not support the video tag.
+    </video>
+<!--    <img src="http://localhost:9091/poster/get/posterId" width="720px" height="480px">-->
 </div>
+
 <!-- Option 1: Bootstrap Bundle with Popper -->
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.0/dist/js/bootstrap.bundle.min.js"
         integrity="sha384-U1DAWAznBHeqEIlVSCgzq+c9gqGAJn5c/t99JyeKa9xxaYpSvHU5awsuZVVFIhvj"
         crossorigin="anonymous"></script>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const videoUrl = 'http://localhost:9091/video/stream/f9afa228e3a5434bb26e9dbd2b85b57e'; // Your video URL
+        const videoPlayer = document.getElementById('videoPlayer');
+
+        // Fetch video with custom headers
+        async function fetchVideoWithHeaders(url) {
+            try {
+                const response = await fetch(url, {
+                    method: 'GET',
+                    headers: {
+                        "Authorization": "Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJ2aWV3ZXJAZ21haWwuY29tIiwiaWF0IjoxNzIyNDYxMDIwLCJleHAiOjE3MjI0NjgyMjB9.diL_mPPdqo1YyevqEQg2RFfUwr-HP8QBBnZ59b_eYj3uvfPgzwjb1wdw2OQ9e2fd25_p968CiIw6atfJIuNJhQ"
+                    }
+                });
+
+                if (!response.ok) {
+                    throw new Error('Network response was not ok');
+                }
+
+                const blob = await response.blob();
+                const blobUrl = URL.createObjectURL(blob);
+                videoPlayer.src = blobUrl;
+            } catch (error) {
+                console.error('Error fetching video:', error);
+            }
+        }
+
+        // Call the function to fetch and set video
+        fetchVideoWithHeaders(videoUrl);
+    });
+</script>
 
 </body>
 </html>

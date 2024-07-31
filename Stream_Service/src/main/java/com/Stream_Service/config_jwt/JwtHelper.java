@@ -15,8 +15,6 @@ import java.util.function.Function;
 @Configuration
 public class JwtHelper {
     //requirement :
-    private Long JWT_TOKEN_VALIDITY = 120L; // TODO:: Give JWT_TOKEN_VALIDITY control to ADMIN
-
 
     private JwtParser parser;
     private SecretKey key;
