@@ -6,7 +6,7 @@ import lombok.Builder;
 public class EpisodeResponse {
     private Long episodeId;
     private String episodeName;
-    private String idInStreamDB;
-    private String posterURL;
+    private String uniqueEpisodeId;
+    private String episodeURL;
     private String createdAt;
 }

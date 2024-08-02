@@ -1,5 +1,6 @@
 package com.Core_Service.model;
 
+import com.Core_Service.helpers.StreamServiceDetails;
 import com.Core_Service.model_response.UserResponse;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
@@ -80,14 +81,14 @@ public class User implements UserDetails {
     public UserResponse to(Admin admin){
         return UserResponse.builder().userId(admin.getId()).name(admin.getName())
                 .username(this.username).authority(this.authority)
-                // TODO:: Here we have to give URL to the profile [profileID is just for now]
-                .profileURL(admin.getUniqueProfileId()).build();
+                .uniqueProfileId(admin.getUniqueProfileId())
+                .profileURL(StreamServiceDetails.STREAM_SERVER_URL + StreamServiceDetails.MEDIA_URI_GET_PROFILE_PATH + admin.getUniqueProfileId()).build();
     }
 
     public UserResponse to(Viewer viewer){
         return UserResponse.builder().userId(viewer.getId()).name(viewer.getName())
                 .username(this.username).authority(this.authority)
-                // TODO:: Here we have to give URL to the profile [profileID is just for now]
-                .profileURL(viewer.getUniqueProfileId()).build();
+                .profileURL(StreamServiceDetails.STREAM_SERVER_URL + StreamServiceDetails.MEDIA_URI_GET_PROFILE_PATH + viewer.getUniqueProfileId())
+                .uniqueProfileId(viewer.getUniqueProfileId()).build();
     }
 }

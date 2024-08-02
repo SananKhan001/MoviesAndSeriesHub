@@ -1,10 +1,13 @@
 package com.Stream_Service.controller;
 
+import com.Stream_Service.enums.VideoType;
 import com.Stream_Service.service.MediaFileService;
 import jakarta.validation.constraints.NotEmpty;
+import jakarta.validation.constraints.NotNull;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.Resource;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.codec.multipart.FilePart;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -69,16 +72,29 @@ public class MediaController {
 
     @PostMapping("/video/upload")
     public Mono<ResponseEntity<Mono<URI>>> uploadVideo(@RequestPart("video") FilePart video,
-                                                         @RequestParam("uniqueId")
+                                                       @RequestParam("uniqueId")
                                                          @NotEmpty(message = "UniqueId should not be Empty !!!")
-                                                         String uniqueId){
+                                                         String uniqueId,
+                                                       @RequestParam(value = "videoType")
+                                                       @NotNull(message = "videoType should not be null !!!")
+                                                       VideoType videoType){
         return Mono.just(
-                ResponseEntity.ok(mediaFileService.uploadVideo(video, uniqueId))
+                ResponseEntity.ok(mediaFileService.uploadVideo(video, uniqueId, videoType))
         );
     }
 
     @GetMapping("/movie/stream/{uniqueId}")
-    public Mono<Resource> streamVideo(@PathVariable("uniqueId") String uniqueId, @RequestHeader(name = "Range", required = false) String range) throws IOException {
+    public Mono<byte[]> streamMovieVideo(@PathVariable("uniqueId") String uniqueId) throws IOException {
         return mediaFileService.getMovieVideo(uniqueId);
+    }
+
+    @GetMapping("/series/stream/{uniqueId}")
+    public Mono<byte[]> streamSeriesVideo(@PathVariable("uniqueId") String uniqueId) throws IOException {
+        return mediaFileService.getSeriesVideo(uniqueId);
+    }
+
+    @DeleteMapping("/delete/media/{uniqueId}")
+    public Mono<Void> deleteMedia(@PathVariable("uniqueId") String uniqueId) {
+        return mediaFileService.deleteMediaFileByUniqueId(uniqueId);
     }
 }

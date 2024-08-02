@@ -8,6 +8,7 @@ public class MovieResponse {
     private String name;
     private String genre;
     private String description;
+    private String uniqueMovieId;
     private String posterURL;
     private int price;
     private int rating;

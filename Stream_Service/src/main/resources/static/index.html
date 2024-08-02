@@ -27,7 +27,7 @@
 
 <script>
     document.addEventListener('DOMContentLoaded', function() {
-        const videoUrl = 'http://localhost:9091/video/stream/f9afa228e3a5434bb26e9dbd2b85b57e'; // Your video URL
+        const videoUrl = 'http://localhost:9091/series/stream/3dd550beefa04951880ae38a31c16d57'; // Your video URL
         const videoPlayer = document.getElementById('videoPlayer');
 
         // Fetch video with custom headers
@@ -36,7 +36,7 @@
                 const response = await fetch(url, {
                     method: 'GET',
                     headers: {
-                        "Authorization": "Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJ2aWV3ZXJAZ21haWwuY29tIiwiaWF0IjoxNzIyNDYxMDIwLCJleHAiOjE3MjI0NjgyMjB9.diL_mPPdqo1YyevqEQg2RFfUwr-HP8QBBnZ59b_eYj3uvfPgzwjb1wdw2OQ9e2fd25_p968CiIw6atfJIuNJhQ"
+                        "Authorization": "Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJ2aWV3ZXJAZ21haWwuY29tIiwiaWF0IjoxNzIyNjIyMzE3LCJleHAiOjE3MjI2Mjk1MTd9.PxiXpTDHEXO1tsxhT2kHY9dj1UOZmTy2Wnwgy1RdGMTNlr_BoCF1LytfyuSRqakTmhTF14GxafuQmayyX97yLQ"
                     }
                 });
 

@@ -38,7 +38,7 @@ public class EpisodeService {
 
     public EpisodeResponse createEpisodeForMovie(String episodeName, Long movieId) {
         Episode episode = Episode.builder().episodeName(episodeName)
-                .episodeId(Helper.generateUUID()).uniquePosterId(Helper.generateUUID())
+                .uniquePosterId(Helper.generateUUID())
                 .belongsToMovie(movieRepository.findById(movieId).get()).build();
         episode = episodeRepository.save(episode);
 
@@ -92,7 +92,6 @@ public class EpisodeService {
                 .orElseThrow(() -> new NoSeriesFoundException("No series found with given series id !!!"));
         Episode episode = Episode.builder()
                 .episodeName(episodeName)
-                .episodeId(Helper.generateUUID())
                 .uniquePosterId(Helper.generateUUID())
                 .belongsToSeries(series)
                 .build();

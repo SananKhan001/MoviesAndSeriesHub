@@ -1,5 +1,6 @@
 package com.Core_Service.model;
 
+import com.Core_Service.helpers.StreamServiceDetails;
 import com.Core_Service.model_response.SeriesResponse;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
@@ -65,7 +66,9 @@ public class Series {
     public SeriesResponse to(){
         return SeriesResponse.builder().seriesId(this.id)
                 .name(this.name).genre(this.genre)
-                .description(this.description).posterURL(this.uniquePosterId)
+                .description(this.description)
+                .uniqueSeriesId(this.uniquePosterId)
+                .posterURL(StreamServiceDetails.STREAM_SERVER_URL + StreamServiceDetails.MEDIA_URI_GET_POSTER_PATH + this.uniquePosterId)
                 .price(this.price).rating(this.rating == null ? -1 : this.rating)
                 .createdAt(this.createdAt.toString())
                 .build();

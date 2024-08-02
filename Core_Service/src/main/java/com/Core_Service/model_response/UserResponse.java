@@ -1,6 +1,5 @@
 package com.Core_Service.model_response;
 
-import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -14,6 +13,7 @@ public class UserResponse {
     private Long userId;
     private String name;
     private String username;
+    private String uniqueProfileId;
     private String profileURL;
     private String authority;
 }

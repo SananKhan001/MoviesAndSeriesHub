@@ -8,6 +8,7 @@ public class SeriesResponse {
     private String name;
     private String genre;
     private String description;
+    private String uniqueSeriesId;
     private String posterURL;
     private int price;
     private int rating;

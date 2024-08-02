@@ -1,5 +1,6 @@
 package com.Core_Service.model;
 
+import com.Core_Service.helpers.StreamServiceDetails;
 import com.Core_Service.model_response.EpisodeResponse;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
@@ -25,10 +26,6 @@ public class Episode {
     private String episodeName;
 
     // uuid
-    @Column(name = "episode_id", nullable = false)
-    private String episodeId;
-
-    // uuid
     @Column(name = "unique_poster_id", nullable = false)
     private String uniquePosterId;
 
@@ -48,7 +45,15 @@ public class Episode {
 
     public EpisodeResponse to(){
         return EpisodeResponse.builder().episodeId(this.id)
-                .episodeName(this.episodeName).idInStreamDB(this.episodeId)
-                .posterURL(this.uniquePosterId).createdAt(this.createdAt.toString()).build();
+                .episodeName(this.episodeName).uniqueEpisodeId(this.uniquePosterId)
+                .episodeURL(episodeURL()).createdAt(this.createdAt.toString()).build();
+    }
+
+    private String episodeURL() {
+        return this.belongsToMovie != null ? (StreamServiceDetails.STREAM_SERVER_URL
+                                                + StreamServiceDetails.MEDIA_URI_MOVIE_STREAM_PATH + this.uniquePosterId)
+                                                :
+                                             (StreamServiceDetails.STREAM_SERVER_URL
+                                                + StreamServiceDetails.MEDIA_URI_SERIES_STREAM_PATH + this.uniquePosterId);
     }
 }

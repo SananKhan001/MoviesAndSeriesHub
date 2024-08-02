@@ -3,24 +3,34 @@ package com.Stream_Service.service;
 import com.Stream_Service.config_jwt.AuthManager;
 import com.Stream_Service.config_jwt.SecurityContext;
 import com.Stream_Service.enums.Authority;
+import com.Stream_Service.enums.VideoType;
 import com.Stream_Service.models.MediaFile;
 import com.Stream_Service.models.User;
 import com.Stream_Service.models.UserMovieMapping;
+import com.Stream_Service.models.UserSeriesMapping;
 import com.Stream_Service.repository.EpisodeRepository;
 import com.Stream_Service.repository.MediaFileRepository;
 import com.Stream_Service.repository.UserMovieMappingRepository;
+import com.Stream_Service.repository.UserSeriesMappingRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.ResourceLoader;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpRange;
 import org.springframework.http.codec.multipart.FilePart;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Mono;
 
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.net.URI;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.List;
+import java.util.Optional;
 
 
 @Service
@@ -37,6 +47,9 @@ public class MediaFileService {
 
     @Autowired
     private UserMovieMappingRepository userMovieMappingRepository;
+
+    @Autowired
+    private UserSeriesMappingRepository userSeriesMappingRepository;
 
     @Value("${media.file.posters.path}")
     private String postersPath;
@@ -59,101 +72,163 @@ public class MediaFileService {
     @Value("${stream.server.url}")
     private String streamServerURL;
 
+    @Value("{media.uri.get.poster.path}")
+    private String getPosterPath;
+
+    @Value("${media.uri.get.profile.path}")
+    private String getProfilePath;
+
+    @Value("${media.uri.movie.stream.path}")
+    private String movieStreamPath;
+
+    @Value("${media.uri.series.stream.path}")
+    private String seriesStreamPath;
+
     public Mono<URI> uploadPoster(FilePart poster, String uniquePosterId) throws IOException {
-        MediaFile mediaFile = MediaFile.builder()
-                .uniqueId(uniquePosterId)
-                .isNew(true)
-                .filePath(
-                    postersPath + postersPrefix + uniquePosterId
-                ).build();
-        poster.transferTo(new File(mediaFile.getFilePath())).subscribe();
-        return mediaFileRepository.save(mediaFile).flatMap(media -> {
-            return Mono.just(URI.create(streamServerURL + "/poster/get/" + media.getUniqueId()));
-        });
+        return Mono.fromCallable(() -> {
+                    MediaFile mediaFile = MediaFile.builder()
+                            .uniqueId(uniquePosterId)
+                            .isNew(true)
+                            .filePath(
+                                    postersPath + postersPrefix + uniquePosterId
+                            ).build();
+                    poster.transferTo(new File(mediaFile.getFilePath())).subscribe();
+                    mediaFileRepository.save(mediaFile).subscribe();
+                    return mediaFile.getUniqueId();
+                }).flatMap(fileUUID -> Mono.just(URI.create(streamServerURL + getPosterPath + fileUUID)));
     }
+
 
     public Mono<byte[]> getPoster(String uniquePosterId) throws IOException {
         return mediaFileRepository.findByUniqueId(uniquePosterId)
-                .hasElement()
-                .flatMap(hasElement -> {
-                    if(!hasElement) return Mono.error(new IllegalArgumentException("Invalid UniquePosterId"));
-                    return Mono.fromSupplier(() -> {
-                        try {
-                            return resourceLoader.getResource("classpath:/static"+ "/posters/" + postersPrefix + uniquePosterId)
-                                    .getContentAsByteArray();
-                        } catch (IOException e) {
-                            throw new RuntimeException(e);
+                .flatMap(mediaFile -> {
+                    return Mono.fromCallable(() -> {
+                        Path path = Paths.get(mediaFile.getFilePath());
+                        if(Files.exists(path)){
+                            return Files.readAllBytes(path);
                         }
-                    });
+                        else throw new FileNotFoundException("No file present at give path !!!");
+                    }).onErrorResume(FileNotFoundException.class, e -> Mono.error(new RuntimeException("Error Reading File", e)));
                 });
     }
 
     public Mono<URI> uploadProfile(FilePart profileImage, String uniqueProfileId) {
-        MediaFile mediaFile = MediaFile.builder()
+        return Mono.fromCallable(() -> {
+            MediaFile mediaFile = MediaFile.builder()
                 .uniqueId(uniqueProfileId)
                 .isNew(true)
                 .filePath(
                         profileImagesPath + profileImagesPrefix + uniqueProfileId
                 ).build();
-        profileImage.transferTo(new File(mediaFile.getFilePath())).subscribe();
-        return mediaFileRepository.save(mediaFile).flatMap(media -> {
-            return Mono.just(URI.create(streamServerURL + "/profile/get/" + media.getUniqueId()));
-        });
+            profileImage.transferTo(new File(mediaFile.getFilePath())).subscribe();
+            mediaFileRepository.save(mediaFile).subscribe();
+            return mediaFile.getUniqueId();
+        }).flatMap(fileUUID -> Mono.just(URI.create(streamServerURL + getProfilePath + fileUUID)));
     }
 
     public Mono<byte[]> getProfile(String uniqueProfileId) {
         return mediaFileRepository.findByUniqueId(uniqueProfileId)
-                .hasElement().flatMap(hasElement -> {
-                    if(!hasElement) return Mono.error(new IllegalArgumentException("Invalid UniqueId"));
-                    return Mono.fromSupplier(() -> {
-                        try {
-                            return resourceLoader.getResource("classpath:/static"+ "/profile_images/" + profileImagesPrefix + uniqueProfileId)
-                                    .getContentAsByteArray();
-                        } catch (IOException e) {
-                            throw new RuntimeException("No poster were found with given id !!!");
+                .flatMap(mediaFile -> {
+                    return Mono.fromCallable(() -> {
+                        Path path = Paths.get(mediaFile.getFilePath());
+                        if(Files.exists(path)){
+                            return Files.readAllBytes(path);
                         }
+                        else throw new FileNotFoundException("No file present at give path !!!");
+                    }).onErrorResume(FileNotFoundException.class, e -> Mono.error(new RuntimeException("Error Reading File", e)));
                 });
-        });
     }
 
-    public Mono<URI> uploadVideo(FilePart video, String uniqueId) {
-        return episodeRepository.findByUniquePosterId(uniqueId)
-                .hasElement().flatMap(hasElement -> {
-                    if(!hasElement) return Mono.error(new IllegalArgumentException("Invalid UniqueId"));
-                    MediaFile mediaFile = MediaFile.builder()
-                            .uniqueId(uniqueId)
-                            .isNew(true)
-                            .filePath(
-                                    videosPath + videosPrefix + uniqueId
-                            ).build();
-                    video.transferTo(new File(mediaFile.getFilePath())).subscribe();
-                    return mediaFileRepository.save(mediaFile).flatMap(media -> {
-                        return Mono.just(URI.create(streamServerURL + "/video/stream/" + media.getUniqueId()));
+    public Mono<URI> uploadVideo(FilePart video, String uniqueId, VideoType videoType) {
+        return episodeRepository.findByUniquePosterId(uniqueId).hasElement()
+                .flatMap(hashElement -> {
+                    if(!hashElement) return Mono.error(new IllegalArgumentException("Invalid UniqueId"));
+                    return Mono.fromCallable(() -> {
+                        MediaFile mediaFile = MediaFile.builder()
+                                .uniqueId(uniqueId)
+                                .isNew(true)
+                                .filePath(
+                                        videosPath + videosPrefix + uniqueId
+                                ).build();
+                        video.transferTo(new File(mediaFile.getFilePath())).subscribe();
+                        mediaFileRepository.save(mediaFile).subscribe();
+                        return mediaFile.getUniqueId();
+                    }).flatMap(fileUUID -> {
+                        if(videoType.equals(VideoType.MOVIE_EPISODE)) return Mono.just(URI.create(streamServerURL + movieStreamPath + fileUUID));
+                        else return Mono.just(URI.create(streamServerURL + seriesStreamPath + fileUUID));
                     });
                 });
     }
 
-    public Mono<Resource> getMovieVideo(String uniqueId) {
+    public Mono<byte[]> getMovieVideo(String uniqueId) {
         User user = (User) SecurityContext.principal();
         return episodeRepository.findByUniquePosterId(uniqueId)
-                .flatMap(episode -> {
-                    return userMovieMappingRepository.userMovieMappingByUserId(user.getId())
-                            .collectList()
-                            .flatMap(userMovieMappings -> {
-                                if(userHas(episode.getMovieId(), userMovieMappings, user.getAuthority())){
-                                    return Mono.fromSupplier(() -> {
-                                        return resourceLoader.getResource("classpath:/static"+ "/videos/" + videosPrefix + episode.getUniquePosterId());
-                                    });
-                                }
-                                return Mono.error(new IllegalArgumentException("Asked Movie is not bought by User !!!"));
-                            });
-                });
+            .flatMap(episode -> {
+                return userMovieMappingRepository.userMovieMappingByUserId(user.getId())
+                    .collectList()
+                    .flatMap(userMovieMappings -> {
+                        if(userHasMovie(episode.getMovieId(), userMovieMappings, user.getAuthority())) {
+                            return mediaFileRepository.findByUniqueId(uniqueId)
+                                .flatMap(mediaFile -> {
+                                    return Mono.fromCallable(() -> {
+                                        Path path = Paths.get(mediaFile.getFilePath());
+                                        if(Files.exists(path)) return Files.readAllBytes(path);
+                                        else throw new FileNotFoundException("No file present at give path !!!");
+                                    }).onErrorResume(FileNotFoundException.class, e -> Mono.error(new RuntimeException("Error Reading File", e)));
+                                });
+                        }
+                        return Mono.error(new IllegalArgumentException("Asked Movie is not bought by User !!!"));
+                    });
+            });
     }
 
-    private boolean userHas(Long movieId, List<UserMovieMapping> userMovieMappings, String userAuthority) {
+    public Mono<byte[]> getSeriesVideo(String uniqueId){
+        User user = (User) SecurityContext.principal();
+        return episodeRepository.findByUniquePosterId(uniqueId)
+            .flatMap(episode -> {
+                return userSeriesMappingRepository.userSeriesMappingByUserId(user.getId())
+                    .collectList()
+                    .flatMap(userSeriesMappings -> {
+                        if(userHasSeries(episode.getSeriesId(), userSeriesMappings, user.getAuthority())) {
+                            return mediaFileRepository.findByUniqueId(uniqueId)
+                                .flatMap(mediaFile -> {
+                                    return Mono.fromCallable(() -> {
+                                        Path path = Paths.get(mediaFile.getFilePath());
+                                        if(Files.exists(path)) return Files.readAllBytes(path);
+                                        else throw new FileNotFoundException("No file present at give path !!!");
+                                    }).onErrorResume(FileNotFoundException.class, e -> Mono.error(new RuntimeException("Error Reading File", e)));
+                                });
+                        }
+                        return Mono.error(new IllegalArgumentException("Asked Series is not bought by User !!!"));
+                    });
+            });
+    }
+
+    private boolean userHasMovie(Long movieId, List<UserMovieMapping> userMovieMappings, String userAuthority) {
         long count = userMovieMappings.parallelStream()
                 .filter(userMovieMapping -> userMovieMapping.getMovieId() == movieId)
                 .count();
         return (count > 0 || userAuthority.equals(Authority.ADMIN.toString()));
+    }
+
+    private boolean userHasSeries(Long seriesId, List<UserSeriesMapping> userMovieMappings, String userAuthority) {
+        long count = userMovieMappings.parallelStream()
+                .filter(userSeriesMapping -> userSeriesMapping.getSeriesId() == seriesId)
+                .count();
+        return (count > 0 || userAuthority.equals(Authority.ADMIN.toString()));
+    }
+
+    public Mono<Void> deleteMediaFileByUniqueId(String uniqueId){
+        return mediaFileRepository.findByUniqueId(uniqueId)
+                .flatMap(mediaFile -> {
+                    return Mono.fromCallable(() -> {
+                        Path path = Paths.get(mediaFile.getFilePath());
+                        if(Files.exists(path)) {
+                            Files.delete(path);
+                        }
+                        mediaFileRepository.deleteById(mediaFile.getId()).subscribe();
+                        return Mono.empty();
+                    });
+                }).then();
     }
 }

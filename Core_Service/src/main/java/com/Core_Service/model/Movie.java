@@ -1,5 +1,6 @@
 package com.Core_Service.model;
 
+import com.Core_Service.helpers.StreamServiceDetails;
 import com.Core_Service.model_response.MovieResponse;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
@@ -69,6 +70,8 @@ public class Movie {
                         this.rating != null ? this.rating : -1
                 )
                 .createdAt(this.createdAt.toString())
+                .uniqueMovieId(this.uniquePosterId)
+                .posterURL(StreamServiceDetails.STREAM_SERVER_URL + StreamServiceDetails.MEDIA_URI_GET_POSTER_PATH + this.uniquePosterId)
                 .build();
     }
 }
