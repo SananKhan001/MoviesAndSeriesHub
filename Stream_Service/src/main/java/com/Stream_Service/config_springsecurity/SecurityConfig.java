@@ -30,8 +30,8 @@ public class SecurityConfig {
         http
                 .authorizeExchange(exchanges ->
                     {
-                        exchanges.pathMatchers("/poster/upload/**", "/video/upload/**").hasAuthority(Authority.ADMIN.toString());
-                        exchanges.pathMatchers("/poster/get/**", "/profile/**", "/video/stream/**").authenticated();
+                        exchanges.pathMatchers("/poster/upload/**", "/video/upload/**", "/delete/media/**").hasAuthority(Authority.ADMIN.toString());
+                        exchanges.pathMatchers("/poster/get/**", "/profile/**", "/movie/stream/**", "/series/stream/**").authenticated();
 
                         exchanges.anyExchange().permitAll();
                     }

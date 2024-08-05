@@ -2,7 +2,9 @@ package com.Core_Service.controller;
 
 import com.Core_Service.custom_exceptions.NoSeriesFoundException;
 import com.Core_Service.enums.Genre;
+import com.Core_Service.model_request.ReviewCreateRequest;
 import com.Core_Service.model_request.SeriesCreateRequest;
+import com.Core_Service.model_response.ReviewResponse;
 import com.Core_Service.model_response.SeriesResponse;
 import com.Core_Service.service.SeriesService;
 import jakarta.annotation.security.PermitAll;
@@ -67,5 +69,11 @@ public class SeriesController {
     @MutationMapping(name = "buySeries")
     public String buySeries(@Argument Long seriesId) throws NoSeriesFoundException {
         return seriesService.assignSeriesToCurrentUser(seriesId);
+    }
+
+    @PreAuthorize("hasAuthority('VIEWER')")
+    @MutationMapping(name = "reviewSeries")
+    public ReviewResponse reviewSeries(@Argument Long seriesId, @Argument ReviewCreateRequest reviewCreateRequest) throws NoSeriesFoundException {
+        return seriesService.reviewSeries(seriesId, reviewCreateRequest);
     }
 }

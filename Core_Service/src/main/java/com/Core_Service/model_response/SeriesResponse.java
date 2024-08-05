@@ -11,6 +11,6 @@ public class SeriesResponse {
     private String uniqueSeriesId;
     private String posterURL;
     private int price;
-    private int rating;
+    private Double rating;
     private String createdAt;
 }

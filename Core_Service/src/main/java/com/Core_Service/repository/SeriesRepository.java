@@ -12,4 +12,7 @@ import java.util.List;
 public interface SeriesRepository extends JpaRepository<Series, Long> {
     @Query(value = "SELECT * FROM series WHERE genre LIKE %?1% ORDER BY created_at DESC", nativeQuery = true)
     List<Series> findByNewReleaseSeriesByGenre(String toString, Pageable pageRequest);
+
+    @Query(value = "SELECT AVG(rev.rating) FROM reviews rev JOIN series ser ON rev.review_for_series = ser.id WHERE ser.id = ?1", nativeQuery = true)
+    double findAverageRating(Long seriesId);
 }

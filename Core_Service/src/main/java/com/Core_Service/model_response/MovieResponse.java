@@ -11,6 +11,6 @@ public class MovieResponse {
     private String uniqueMovieId;
     private String posterURL;
     private int price;
-    private int rating;
+    private double rating;
     private String createdAt;
 }

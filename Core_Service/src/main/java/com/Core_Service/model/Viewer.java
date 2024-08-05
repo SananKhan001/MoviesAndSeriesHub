@@ -33,11 +33,11 @@ public class Viewer {
     @Column(name = "unique_profile_id", nullable = false)
     private String uniqueProfileId;
 
-    @ManyToMany(mappedBy = "viewers", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @ManyToMany(mappedBy = "viewers", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     @JsonIgnore
     private List<Movie> purchasedMovies;
 
-    @ManyToMany(mappedBy = "viewers", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @ManyToMany(mappedBy = "viewers", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     @JsonIgnore
     private List<Series> purchasedSeries;
 

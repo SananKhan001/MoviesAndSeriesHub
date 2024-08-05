@@ -1,5 +1,6 @@
 package com.Core_Service.model;
 
+import com.Core_Service.model_response.ReviewResponse;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
@@ -44,4 +45,12 @@ public class Review {
     @CreationTimestamp
     @Column(name = "created_at")
     private Date createdAt;
+
+    public ReviewResponse to() {
+        return ReviewResponse.builder()
+                .id(this.id)
+                .viewerId(this.viewer.getId())
+                .comment(this.comment)
+                .rating(this.rating).build();
+    }
 }

@@ -3,11 +3,15 @@ package com.Core_Service.service;
 import com.Core_Service.custom_exceptions.NoMovieFoundException;
 import com.Core_Service.helpers.Helper;
 import com.Core_Service.model.Movie;
+import com.Core_Service.model.Review;
 import com.Core_Service.model.User;
 import com.Core_Service.model.Viewer;
 import com.Core_Service.model_request.MovieCreateRequest;
+import com.Core_Service.model_request.ReviewCreateRequest;
 import com.Core_Service.model_response.MovieResponse;
+import com.Core_Service.model_response.ReviewResponse;
 import com.Core_Service.repository.MovieRepository;
+import com.Core_Service.repository.ReviewRepository;
 import org.commonDTO.MovieBuyMessage;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cloud.stream.function.StreamBridge;
@@ -26,6 +30,9 @@ public class MovieService {
 
     @Autowired
     private StreamBridge streamBridge;
+
+    @Autowired
+    private ReviewRepository reviewRepository;
 
     public MovieResponse addMovie(MovieCreateRequest movieCreateRequest){
         Movie movie = Movie.builder().name(movieCreateRequest.getName())
@@ -83,7 +90,7 @@ public class MovieService {
         Movie movie = movieRepository.findById(movieId)
                 .orElseThrow(() -> new NoMovieFoundException("No movie present with provided movie id !!!"));
 
-        if(userAlreadyHave(movie, viewer)) throw new NoMovieFoundException("This movie is not available for you to buy !!!");
+        if(userAlreadyHas(movie, viewer)) throw new NoMovieFoundException("This movie is not available for you to buy !!!");
 
         movie.getViewers().add(viewer);
         movie = movieRepository.save(movie);
@@ -101,11 +108,34 @@ public class MovieService {
         return "Bought movie successfully !!!";
     }
 
-    private boolean userAlreadyHave(Movie movie, Viewer viewer) {
-        long viewerId = viewer.getId();
-        List<Viewer> viewers = movie.getViewers().parallelStream()
-                .filter(v -> v.getId() == viewerId)
-                .collect(Collectors.toList());
-        return !viewers.isEmpty();
+    private boolean userAlreadyHas(Movie movie, Viewer viewer) {
+        return viewer.getPurchasedMovies()
+                .parallelStream()
+                .filter(m -> m.getId().equals(movie.getId()))
+                .count() > 0;
+    }
+
+    public ReviewResponse reviewMovie(Long movieId, ReviewCreateRequest reviewCreateRequest) throws NoMovieFoundException {
+        Movie movie = movieRepository.findById(movieId)
+                .orElseThrow(() -> new NoMovieFoundException("No Movie found with given id !!!"));
+
+        User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        Viewer viewer = user.getViewer();
+        if(userAlreadyHas(movie, viewer)) {
+            Review review = Review.builder()
+                    .viewer(viewer)
+                    .comment(reviewCreateRequest.getComment())
+                    .rating(reviewCreateRequest.getRating())
+                    .reviewForMovie(movie).build();
+            review = reviewRepository.save(review);
+
+            double newAvgRating = movieRepository.findAverageRating(movieId);
+            movie.setRating(newAvgRating);
+            movieRepository.save(movie);
+
+            return review.to();
+        }
+
+        throw new NoMovieFoundException("This Movie is not in list of user !!!");
     }
 }

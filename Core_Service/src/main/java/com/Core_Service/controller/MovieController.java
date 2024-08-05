@@ -3,7 +3,9 @@ package com.Core_Service.controller;
 import com.Core_Service.custom_exceptions.NoMovieFoundException;
 import com.Core_Service.enums.Genre;
 import com.Core_Service.model_request.MovieCreateRequest;
+import com.Core_Service.model_request.ReviewCreateRequest;
 import com.Core_Service.model_response.MovieResponse;
+import com.Core_Service.model_response.ReviewResponse;
 import com.Core_Service.service.MovieService;
 import jakarta.annotation.security.PermitAll;
 import jakarta.validation.constraints.NotNull;
@@ -72,5 +74,11 @@ public class MovieController {
     @MutationMapping(name = "buyMovie")
     public String buyMovie(@Argument Long movieId) throws NoMovieFoundException {
         return movieService.assignMovieToCurrentUser(movieId);
+    }
+
+    @PreAuthorize("hasAuthority('VIEWER')")
+    @MutationMapping(name = "reviewMovie")
+    public ReviewResponse reviewMovie(@Argument Long movieId, @Argument ReviewCreateRequest reviewCreateRequest) throws NoMovieFoundException {
+        return movieService.reviewMovie(movieId, reviewCreateRequest);
     }
 }

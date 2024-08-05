@@ -27,8 +27,7 @@ public class MediaController {
 
     @Autowired
     private MediaFileService mediaFileService;
-
-    // http://localhost:9091/upload/poster
+    
     @PostMapping("/poster/upload")
     public Mono<ResponseEntity<Mono<URI>>> uploadPoster(@RequestPart("poster") FilePart poster, @RequestParam("uniquePosterId")
                                                                                                   @NotEmpty(message = "PosterId should not be Empty !!!")

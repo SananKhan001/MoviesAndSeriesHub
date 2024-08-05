@@ -44,7 +44,7 @@ public class Series {
     private List<Review> reviews;
 
     @Column(name = "overall_rating")
-    private Integer rating;
+    private Double rating;
 
     @ManyToMany(fetch = FetchType.LAZY)
     @JsonIgnore

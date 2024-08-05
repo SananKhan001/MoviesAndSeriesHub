@@ -29,6 +29,11 @@ input JWTRequest{
     password:String!
 }
 
+input ReviewCreateRequest{
+    comment:String!,
+    rating:Int!
+}
+
 type JWTResponse{
     jwtToken:String!
 }
@@ -50,7 +55,7 @@ type MovieResponse{
     uniqueMovieId:String!,
     posterURL:String!,
     price:Int!,
-    rating:Int!,
+    rating:Float!,
     createdAt:String!
 }
 
@@ -70,8 +75,15 @@ type SeriesResponse {
     uniqueSeriesId:String!,
     posterURL:String!,
     price:Int!,
-    rating:Int!
+    rating:Float!
     createdAt:String!
+}
+
+type ReviewResponse {
+    id:ID!,
+    viewerId:ID!,
+    comment:String!,
+    rating:Int!
 }
 
 type Mutation{
@@ -107,6 +119,12 @@ type Mutation{
 
     # To BUY a series [Only accessible by VIEWER] TODO:: [REPAIR THIS DUMMY METHOD]
     buySeries(seriesId:ID!):String
+
+    # To REVIEW a movie [Only accessible by VIEWER]
+    reviewMovie(movieId:ID!, reviewCreateRequest:ReviewCreateRequest!):ReviewResponse
+
+    # To REVIEW a series [Only accessible by VIEWER]
+    reviewSeries(seriesId:ID!, reviewCreateRequest:ReviewCreateRequest!):ReviewResponse
 }
 
 type Query{
