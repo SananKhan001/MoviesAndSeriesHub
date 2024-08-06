@@ -12,6 +12,7 @@ import com.Stream_Service.repository.EpisodeRepository;
 import com.Stream_Service.repository.MediaFileRepository;
 import com.Stream_Service.repository.UserMovieMappingRepository;
 import com.Stream_Service.repository.UserSeriesMappingRepository;
+import jakarta.annotation.PostConstruct;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.Resource;
@@ -83,6 +84,18 @@ public class MediaFileService {
 
     @Value("${media.uri.series.stream.path}")
     private String seriesStreamPath;
+
+    @PostConstruct
+    public void init() throws IOException {
+        String videos = videosPath; /** There was some issue in accessing videoPath directly */
+
+        Path posterPath = Paths.get(postersPath);
+        Path profileImagePath = Paths.get(profileImagesPath);
+        Path videosPath = Paths.get(videos);
+        if(!Files.exists(posterPath)) Files.createDirectories(posterPath);
+        if(!Files.exists(profileImagePath)) Files.createDirectories(profileImagePath);
+        if(!Files.exists(videosPath)) Files.createDirectories(videosPath);
+    }
 
     public Mono<URI> uploadPoster(FilePart poster, String uniquePosterId) throws IOException {
         return Mono.fromCallable(() -> {

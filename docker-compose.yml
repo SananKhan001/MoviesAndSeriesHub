@@ -11,19 +11,19 @@ services:
     ports:
       - "3306:3306"
 
-#  elasticsearch:
-#    image: elasticsearch:7.17.22
-#    container_name: elasticsearch
-#    ports:
-#      - "9200:9200"
-#      - "9300:9300"
-#    deploy:
-#      resources:
-#        limits:
-#          memory: 1GB
-#    environment:
-#      - discovery.type=single-node
-#
+  elasticsearch:
+    image: elasticsearch:7.17.22
+    container_name: elasticsearch
+    ports:
+      - "9200:9200"
+      - "9300:9300"
+    deploy:
+      resources:
+        limits:
+          memory: 1GB
+    environment:
+      - discovery.type=single-node
+
   zookeeper:
     image: docker.io/bitnami/zookeeper:3.9
     container_name: kafka_zookeeper
