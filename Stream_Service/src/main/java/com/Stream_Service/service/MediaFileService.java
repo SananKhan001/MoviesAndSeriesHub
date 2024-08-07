@@ -15,6 +15,7 @@ import com.Stream_Service.repository.UserSeriesMappingRepository;
 import jakarta.annotation.PostConstruct;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.io.FileSystemResource;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.ResourceLoader;
 import org.springframework.http.HttpHeaders;
@@ -112,13 +113,14 @@ public class MediaFileService {
     }
 
 
-    public Mono<byte[]> getPoster(String uniquePosterId) throws IOException {
+    public Mono<Resource> getPoster(String uniquePosterId) throws IOException {
         return mediaFileRepository.findByUniqueId(uniquePosterId)
                 .flatMap(mediaFile -> {
                     return Mono.fromCallable(() -> {
                         Path path = Paths.get(mediaFile.getFilePath());
                         if(Files.exists(path)){
-                            return Files.readAllBytes(path);
+                            Resource resource = new FileSystemResource(path);
+                            return resource;
                         }
                         else throw new FileNotFoundException("No file present at give path !!!");
                     }).onErrorResume(FileNotFoundException.class, e -> Mono.error(new RuntimeException("Error Reading File", e)));
@@ -139,13 +141,14 @@ public class MediaFileService {
         }).flatMap(fileUUID -> Mono.just(URI.create(streamServerURL + getProfilePath + fileUUID)));
     }
 
-    public Mono<byte[]> getProfile(String uniqueProfileId) {
+    public Mono<Resource> getProfile(String uniqueProfileId) {
         return mediaFileRepository.findByUniqueId(uniqueProfileId)
                 .flatMap(mediaFile -> {
                     return Mono.fromCallable(() -> {
                         Path path = Paths.get(mediaFile.getFilePath());
                         if(Files.exists(path)){
-                            return Files.readAllBytes(path);
+                            Resource resource = new FileSystemResource(path);
+                            return resource;
                         }
                         else throw new FileNotFoundException("No file present at give path !!!");
                     }).onErrorResume(FileNotFoundException.class, e -> Mono.error(new RuntimeException("Error Reading File", e)));
@@ -173,7 +176,7 @@ public class MediaFileService {
                 });
     }
 
-    public Mono<byte[]> getMovieVideo(String uniqueId) {
+    public Mono<Resource> getMovieVideo(String uniqueId) {
         User user = (User) SecurityContext.principal();
         return episodeRepository.findByUniquePosterId(uniqueId)
             .flatMap(episode -> {
@@ -185,7 +188,10 @@ public class MediaFileService {
                                 .flatMap(mediaFile -> {
                                     return Mono.fromCallable(() -> {
                                         Path path = Paths.get(mediaFile.getFilePath());
-                                        if(Files.exists(path)) return Files.readAllBytes(path);
+                                        if(Files.exists(path)) {
+                                            Resource resource = new FileSystemResource(path);
+                                            return resource;
+                                        }
                                         else throw new FileNotFoundException("No file present at give path !!!");
                                     }).onErrorResume(FileNotFoundException.class, e -> Mono.error(new RuntimeException("Error Reading File", e)));
                                 });
@@ -195,7 +201,7 @@ public class MediaFileService {
             });
     }
 
-    public Mono<byte[]> getSeriesVideo(String uniqueId){
+    public Mono<Resource> getSeriesVideo(String uniqueId){
         User user = (User) SecurityContext.principal();
         return episodeRepository.findByUniquePosterId(uniqueId)
             .flatMap(episode -> {
@@ -207,7 +213,10 @@ public class MediaFileService {
                                 .flatMap(mediaFile -> {
                                     return Mono.fromCallable(() -> {
                                         Path path = Paths.get(mediaFile.getFilePath());
-                                        if(Files.exists(path)) return Files.readAllBytes(path);
+                                        if(Files.exists(path)) {
+                                            Resource resource = new FileSystemResource(path);
+                                            return resource;
+                                        }
                                         else throw new FileNotFoundException("No file present at give path !!!");
                                     }).onErrorResume(FileNotFoundException.class, e -> Mono.error(new RuntimeException("Error Reading File", e)));
                                 });

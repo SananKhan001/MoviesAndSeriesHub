@@ -38,7 +38,7 @@ public class MediaController {
     }
 
     @GetMapping("/poster/get/{posterId}")
-    public Mono<ResponseEntity<Mono<byte[]>>> getPoster(@PathVariable("posterId")
+    public Mono<ResponseEntity<Mono<Resource>>> getPoster(@PathVariable("posterId")
                                             @NotEmpty(message = "PosterId should not be Empty !!!")
                                             String uniquePosterId) throws IOException {
         return Mono.just(
@@ -59,7 +59,7 @@ public class MediaController {
     }
 
     @GetMapping("/profile/get/{profileId}")
-    public Mono<ResponseEntity<Mono<byte[]>>> getProfile(@PathVariable("profileId")
+    public Mono<ResponseEntity<Mono<Resource>>> getProfile(@PathVariable("profileId")
                                                         @NotEmpty(message = "ProfileId should not be Empty !!!")
                                                         String uniqueProfileId) throws IOException {
         return Mono.just(
@@ -83,12 +83,12 @@ public class MediaController {
     }
 
     @GetMapping("/movie/stream/{uniqueId}")
-    public Mono<byte[]> streamMovieVideo(@PathVariable("uniqueId") String uniqueId) throws IOException {
+    public Mono<Resource> streamMovieVideo(@PathVariable("uniqueId") String uniqueId) throws IOException {
         return mediaFileService.getMovieVideo(uniqueId);
     }
 
     @GetMapping("/series/stream/{uniqueId}")
-    public Mono<byte[]> streamSeriesVideo(@PathVariable("uniqueId") String uniqueId) throws IOException {
+    public Mono<Resource> streamSeriesVideo(@PathVariable("uniqueId") String uniqueId) throws IOException {
         return mediaFileService.getSeriesVideo(uniqueId);
     }
 
