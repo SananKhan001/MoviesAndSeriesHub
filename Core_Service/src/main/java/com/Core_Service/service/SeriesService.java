@@ -4,6 +4,7 @@ import com.Core_Service.custom_exceptions.NoMovieFoundException;
 import com.Core_Service.custom_exceptions.NoSeriesFoundException;
 import com.Core_Service.enums.Genre;
 import com.Core_Service.helpers.Helper;
+import com.Core_Service.helpers.StreamServiceDetails;
 import com.Core_Service.model.*;
 import com.Core_Service.model_request.ReviewCreateRequest;
 import com.Core_Service.model_request.SeriesCreateRequest;
@@ -11,7 +12,9 @@ import com.Core_Service.model_response.ReviewResponse;
 import com.Core_Service.model_response.SeriesResponse;
 import com.Core_Service.repository.ReviewRepository;
 import com.Core_Service.repository.SeriesRepository;
+import org.commonDTO.MovieCreationMessage;
 import org.commonDTO.SeriesBuyMessage;
+import org.commonDTO.SeriesCreationMessage;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cloud.stream.function.StreamBridge;
 import org.springframework.data.domain.Pageable;
@@ -38,7 +41,26 @@ public class SeriesService {
                 .genre(seriesCreateRequest.getGenre().toString())
                 .description(seriesCreateRequest.getDescription())
                 .uniquePosterId(Helper.generateUUID()).price(seriesCreateRequest.getPrice()).build();
-        return seriesRepository.save(series).to();
+        series = seriesRepository.save(series);
+
+        /**                                  -----------------------------
+         *  SeriesCreationMessage ======>>> | SeriesCreationMessageTopic |
+         *                                  -----------------------------
+         */
+        streamBridge.send("SeriesCreationMessageTopic", SeriesCreationMessage.builder()
+                .id(series.getId())
+                .name(series.getName().toLowerCase())
+                .genre(series.getGenre())
+                .description(series.getDescription().toLowerCase())
+                .posterURL(
+                        StreamServiceDetails.STREAM_SERVER_URL + StreamServiceDetails.MEDIA_URI_GET_POSTER_PATH + series.getUniquePosterId()
+                )
+                .price(series.getPrice())
+                .rating(series.getRating() == null ? -1 : series.getRating())
+                .createdAt(series.getCreatedAt())
+                .build());
+
+        return series.to();
     }
 
     public SeriesResponse getSeriesById(Long seriesId) throws NoSeriesFoundException {

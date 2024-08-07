@@ -17,7 +17,7 @@
     <video id="videoPlayer" width="720px" height="480px" controls preload="none">
         Your browser does not support the video tag.
     </video>
-<!--    <img src="http://localhost:9091/poster/get/posterId" width="720px" height="480px">-->
+    <img src="http://localhost:8082/poster/get/29f0080bdd97463ab0b67125cd4cb886" width="720px" height="480px">
 </div>
 
 <!-- Option 1: Bootstrap Bundle with Popper -->
@@ -27,7 +27,7 @@
 
 <script>
     document.addEventListener('DOMContentLoaded', function() {
-        const videoUrl = 'http://localhost:9091/series/stream/3dd550beefa04951880ae38a31c16d57'; // Your video URL
+        const videoUrl = 'http://localhost:8082/series/stream/a5db28ff99844790838a461620fa59e7'; // Your video URL
         const videoPlayer = document.getElementById('videoPlayer');
 
         // Fetch video with custom headers
@@ -36,7 +36,7 @@
                 const response = await fetch(url, {
                     method: 'GET',
                     headers: {
-                        "Authorization": "Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJ2aWV3ZXJAZ21haWwuY29tIiwiaWF0IjoxNzIyNjIyMzE3LCJleHAiOjE3MjI2Mjk1MTd9.PxiXpTDHEXO1tsxhT2kHY9dj1UOZmTy2Wnwgy1RdGMTNlr_BoCF1LytfyuSRqakTmhTF14GxafuQmayyX97yLQ"
+                        "Authorization": "Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJhZG1pbkBnbWFpbC5jb20iLCJpYXQiOjE3MjMwNjgzMTUsImV4cCI6MTcyMzA3NTUxNX0.ubuWKtzY-eeMG5upS6fl3iaVO_sZLx989DELYKBLCBJcf7kKcAF5pFCHZTTU3gQQTV51qY5AnCoOCmSHUQqerA"
                     }
                 });
 

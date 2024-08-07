@@ -13,6 +13,7 @@ import com.Stream_Service.repository.MediaFileRepository;
 import com.Stream_Service.repository.UserMovieMappingRepository;
 import com.Stream_Service.repository.UserSeriesMappingRepository;
 import jakarta.annotation.PostConstruct;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.FileSystemResource;
@@ -34,7 +35,7 @@ import java.nio.file.Paths;
 import java.util.List;
 import java.util.Optional;
 
-
+@Slf4j
 @Service
 public class MediaFileService {
 
@@ -74,7 +75,7 @@ public class MediaFileService {
     @Value("${stream.server.url}")
     private String streamServerURL;
 
-    @Value("{media.uri.get.poster.path}")
+    @Value("${media.uri.get.poster.path}")
     private String getPosterPath;
 
     @Value("${media.uri.get.profile.path}")
@@ -96,6 +97,18 @@ public class MediaFileService {
         if(!Files.exists(posterPath)) Files.createDirectories(posterPath);
         if(!Files.exists(profileImagePath)) Files.createDirectories(profileImagePath);
         if(!Files.exists(videosPath)) Files.createDirectories(videosPath);
+
+        log.info("postersPath: {}", posterPath);
+        log.info("profileImagesPath: {}", profileImagePath);
+        log.info("videosPath: {}", videosPath);
+        log.info("postersPrefix: {}", postersPrefix);
+        log.info("profileImagesPrefix: {}", profileImagesPrefix);
+        log.info("videosPrefix: {}", videosPrefix);
+        log.info("streamServerURL: {}", streamServerURL);
+        log.info("getPosterPath: {}", getPosterPath);
+        log.info("getProfilePath: {}", getProfilePath);
+        log.info("movieStreamPath: {}", movieStreamPath);
+        log.info("seriesStreamPath: {}", seriesStreamPath);
     }
 
     public Mono<URI> uploadPoster(FilePart poster, String uniquePosterId) throws IOException {

@@ -2,6 +2,7 @@ package com.Core_Service.service;
 
 import com.Core_Service.custom_exceptions.NoMovieFoundException;
 import com.Core_Service.helpers.Helper;
+import com.Core_Service.helpers.StreamServiceDetails;
 import com.Core_Service.model.Movie;
 import com.Core_Service.model.Review;
 import com.Core_Service.model.User;
@@ -13,6 +14,7 @@ import com.Core_Service.model_response.ReviewResponse;
 import com.Core_Service.repository.MovieRepository;
 import com.Core_Service.repository.ReviewRepository;
 import org.commonDTO.MovieBuyMessage;
+import org.commonDTO.MovieCreationMessage;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cloud.stream.function.StreamBridge;
 import org.springframework.data.domain.Pageable;
@@ -39,7 +41,26 @@ public class MovieService {
                 .genre(movieCreateRequest.getGenre().toString()).description(movieCreateRequest.getDescription())
                 .uniquePosterId(Helper.generateUUID()).price(movieCreateRequest.getPrice())
                 .build();
-        return movieRepository.save(movie).to();
+        movie = movieRepository.save(movie);
+
+        /**                                 ----------------------------
+         *  MovieCreationMessage ======>>> | MovieCreationMessageTopic |
+         *                                 ----------------------------
+         */
+        streamBridge.send("MovieCreationMessageTopic", MovieCreationMessage.builder()
+                .id(movie.getId())
+                .name(movie.getName().toLowerCase())
+                .genre(movie.getGenre())
+                .description(movie.getDescription().toLowerCase())
+                .posterURL(
+                        StreamServiceDetails.STREAM_SERVER_URL + StreamServiceDetails.MEDIA_URI_GET_POSTER_PATH + movie.getUniquePosterId()
+                )
+                .price(movie.getPrice())
+                .rating(movie.getRating() == null ? -1 : movie.getRating())
+                .createdAt(movie.getCreatedAt())
+                .build());
+
+        return movie.to();
     }
 
     public MovieResponse updateMovie(MovieCreateRequest movieCreateRequest, Long id) throws NoMovieFoundException {
