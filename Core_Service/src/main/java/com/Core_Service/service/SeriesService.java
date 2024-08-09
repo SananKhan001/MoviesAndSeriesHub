@@ -153,7 +153,24 @@ public class SeriesService {
 
             double newAvgRating = seriesRepository.findAverageRating(seriesId);
             series.setRating(newAvgRating);
-            seriesRepository.save(series);
+            series = seriesRepository.save(series);
+
+            /**                                  -----------------------------
+             *  SeriesCreationMessage ======>>> | SeriesUpdationMessageTopic |
+             *                                  -----------------------------
+             */
+            streamBridge.send("SeriesUpdationMessageTopic", SeriesCreationMessage.builder()
+                    .id(series.getId())
+                    .name(series.getName().toLowerCase())
+                    .genre(series.getGenre())
+                    .description(series.getDescription().toLowerCase())
+                    .posterURL(
+                            StreamServiceDetails.STREAM_SERVER_URL + StreamServiceDetails.MEDIA_URI_GET_POSTER_PATH + series.getUniquePosterId()
+                    )
+                    .price(series.getPrice())
+                    .rating(series.getRating() == null ? -1 : series.getRating())
+                    .createdAt(series.getCreatedAt())
+                    .build());
 
             return review.to();
         }

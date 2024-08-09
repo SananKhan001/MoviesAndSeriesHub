@@ -17,6 +17,7 @@ public class MovieCreationMessage {
     private String description;
     private String posterURL;
     private int price;
+    
     private double rating;
     private Date createdAt;
 }

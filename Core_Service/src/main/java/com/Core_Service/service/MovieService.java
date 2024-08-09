@@ -152,7 +152,24 @@ public class MovieService {
 
             double newAvgRating = movieRepository.findAverageRating(movieId);
             movie.setRating(newAvgRating);
-            movieRepository.save(movie);
+            movie = movieRepository.save(movie);
+
+            /**                                 ----------------------------
+             *  MovieCreationMessage ======>>> | MovieUpdationMessageTopic |
+             *                                 ----------------------------
+             */
+            streamBridge.send("MovieUpdationMessageTopic", MovieCreationMessage.builder()
+                    .id(movie.getId())
+                    .name(movie.getName().toLowerCase())
+                    .genre(movie.getGenre())
+                    .description(movie.getDescription().toLowerCase())
+                    .posterURL(
+                            StreamServiceDetails.STREAM_SERVER_URL + StreamServiceDetails.MEDIA_URI_GET_POSTER_PATH + movie.getUniquePosterId()
+                    )
+                    .price(movie.getPrice())
+                    .rating(movie.getRating() == null ? -1 : movie.getRating())
+                    .createdAt(movie.getCreatedAt())
+                    .build());
 
             return review.to();
         }
