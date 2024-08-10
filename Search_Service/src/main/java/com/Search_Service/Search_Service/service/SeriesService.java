@@ -18,6 +18,7 @@ public class SeriesService {
                 .id(seriesCreationMessage.getId()).name(seriesCreationMessage.getName())
                 .genre(seriesCreationMessage.getGenre())
                 .description(seriesCreationMessage.getDescription())
+                .searchableDescription(seriesCreationMessage.getSearchableDescription())
                 .posterURL(seriesCreationMessage.getPosterURL())
                 .price(seriesCreationMessage.getPrice()).rating(seriesCreationMessage.getRating())
                 .createdAt(seriesCreationMessage.getCreatedAt()).build();

@@ -14,6 +14,7 @@ public class MovieCreationMessage {
 
     private String name;
     private String genre;
+    private String searchableDescription;
     private String description;
     private String posterURL;
     private int price;

@@ -51,7 +51,8 @@ public class SeriesService {
                 .id(series.getId())
                 .name(series.getName().toLowerCase())
                 .genre(series.getGenre())
-                .description(series.getDescription().toLowerCase())
+                .description(series.getDescription())
+                .searchableDescription(series.getDescription().toLowerCase())
                 .posterURL(
                         StreamServiceDetails.STREAM_SERVER_URL + StreamServiceDetails.MEDIA_URI_GET_POSTER_PATH + series.getUniquePosterId()
                 )
@@ -163,7 +164,8 @@ public class SeriesService {
                     .id(series.getId())
                     .name(series.getName().toLowerCase())
                     .genre(series.getGenre())
-                    .description(series.getDescription().toLowerCase())
+                    .description(series.getDescription())
+                    .searchableDescription(series.getDescription().toLowerCase())
                     .posterURL(
                             StreamServiceDetails.STREAM_SERVER_URL + StreamServiceDetails.MEDIA_URI_GET_POSTER_PATH + series.getUniquePosterId()
                     )

@@ -23,6 +23,7 @@ public class Series {
     private String name;
     private String genre;
     private String description;
+    private String searchableDescription;
     private String posterURL;
     private int price;
     private double rating;

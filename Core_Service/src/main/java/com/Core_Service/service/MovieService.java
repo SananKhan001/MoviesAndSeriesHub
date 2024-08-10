@@ -51,7 +51,8 @@ public class MovieService {
                 .id(movie.getId())
                 .name(movie.getName().toLowerCase())
                 .genre(movie.getGenre())
-                .description(movie.getDescription().toLowerCase())
+                .description(movie.getDescription())
+                .searchableDescription(movie.getDescription().toLowerCase())
                 .posterURL(
                         StreamServiceDetails.STREAM_SERVER_URL + StreamServiceDetails.MEDIA_URI_GET_POSTER_PATH + movie.getUniquePosterId()
                 )
@@ -162,7 +163,8 @@ public class MovieService {
                     .id(movie.getId())
                     .name(movie.getName().toLowerCase())
                     .genre(movie.getGenre())
-                    .description(movie.getDescription().toLowerCase())
+                    .description(movie.getDescription())
+                    .searchableDescription(movie.getDescription().toLowerCase())
                     .posterURL(
                             StreamServiceDetails.STREAM_SERVER_URL + StreamServiceDetails.MEDIA_URI_GET_POSTER_PATH + movie.getUniquePosterId()
                     )
