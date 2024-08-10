@@ -161,4 +161,9 @@ type Query{
     getNewReleaseSeriesByGenre(genre:String!, page:Int = 0, size:Int = 2):[SeriesResponse]
     # To GET episodes of a series [Accessible by VIEWER and ADMIN]
     getEpisodesBySeriesId(seriesId:ID!):[EpisodeResponse]
+
+    # To GET reviews of a movie [Accessible by VIEWER and ADMIN]
+    getReviewsOfMovie(movieId:ID!, page:Int = 0, size:Int = 2):[ReviewResponse]
+    # To GET reviews of a series [Accessible by VIEWER and ADMIN]
+    getReviewsOfSeries(seriesId:ID!, page:Int = 0, size:Int = 2):[ReviewResponse]
 }

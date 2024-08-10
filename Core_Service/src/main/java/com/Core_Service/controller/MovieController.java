@@ -81,4 +81,13 @@ public class MovieController {
     public ReviewResponse reviewMovie(@Argument Long movieId, @Argument ReviewCreateRequest reviewCreateRequest) throws NoMovieFoundException {
         return movieService.reviewMovie(movieId, reviewCreateRequest);
     }
+
+    @PreAuthorize("hasAnyAuthority('VIEWER', 'ADMIN')")
+    @QueryMapping(name = "getReviewsOfMovie")
+    public List<ReviewResponse> getReviewsOfMovie(@Argument Long movieId,
+                                                  @Argument Integer page,
+                                                  @Argument Integer size) throws NoMovieFoundException {
+        Pageable pageRequest = PageRequest.of(page, size);
+        return movieService.getReviewsOfMovie(movieId, pageRequest);
+    }
 }

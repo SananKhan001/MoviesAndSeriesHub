@@ -177,4 +177,11 @@ public class SeriesService {
 
         throw new NoSeriesFoundException("This Series is not in list of user !!!");
     }
+
+    public List<ReviewResponse> getReviewsOfMovie(Long seriesId, Pageable pageRequest) throws NoMovieFoundException {
+        Series series = seriesRepository.findById(seriesId)
+                .orElseThrow(() -> new NoMovieFoundException("No movie found with given id !!!"));
+        return reviewRepository.findByReviewForSeries(series, pageRequest).get()
+                .stream().map(review -> review.to()).collect(Collectors.toList());
+    }
 }

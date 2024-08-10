@@ -1,5 +1,6 @@
 package com.Core_Service.controller;
 
+import com.Core_Service.custom_exceptions.NoMovieFoundException;
 import com.Core_Service.custom_exceptions.NoSeriesFoundException;
 import com.Core_Service.enums.Genre;
 import com.Core_Service.model_request.ReviewCreateRequest;
@@ -75,5 +76,14 @@ public class SeriesController {
     @MutationMapping(name = "reviewSeries")
     public ReviewResponse reviewSeries(@Argument Long seriesId, @Argument ReviewCreateRequest reviewCreateRequest) throws NoSeriesFoundException {
         return seriesService.reviewSeries(seriesId, reviewCreateRequest);
+    }
+
+    @PreAuthorize("hasAnyAuthority('VIEWER', 'ADMIN')")
+    @QueryMapping(name = "getReviewsOfSeries")
+    public List<ReviewResponse> getReviewsOfSeries(@Argument Long seriesId,
+                                                  @Argument Integer page,
+                                                  @Argument Integer size) throws NoMovieFoundException {
+        Pageable pageRequest = PageRequest.of(page, size);
+        return seriesService.getReviewsOfMovie(seriesId, pageRequest);
     }
 }
