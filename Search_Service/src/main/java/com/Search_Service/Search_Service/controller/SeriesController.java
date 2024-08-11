@@ -1,6 +1,5 @@
 package com.Search_Service.Search_Service.controller;
 
-import com.Search_Service.Search_Service.repository.SeriesRepository;
 import com.Search_Service.Search_Service.service.SeriesService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
