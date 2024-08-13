@@ -23,12 +23,8 @@ import java.util.stream.Collectors;
 
 @Service
 public class MovieService {
-
     @Autowired
     private MovieRepository movieRepository;
-
-    @Autowired
-    private ElasticsearchClient elasticsearchClient;
 
     public void save(MovieCreationMessage movieCreationMessage){
         Movie movie = Movie.builder()
@@ -48,45 +44,5 @@ public class MovieService {
 
     public Iterable<Movie> findAll() {
         return movieRepository.findAll();
-    }
-
-    public List<Movie> search(SearchRequest searchRequest) throws IOException {
-
-        Supplier<Query> mustQuerySupplier = ElasticSearchUtil.matchQuerySupplier("searchableDescription", searchRequest.getMovieDescription());
-
-        if(searchRequest.getStartingPrice() != null && searchRequest.getEndPrice() != null &&
-            searchRequest.getMinRating() != null && searchRequest.getMaxRating() != null) {
-            // Searching by combining every thing
-            Query filterByRatingQuery = ElasticSearchUtil.rangeQuerySupplier("rating", searchRequest.getMinRating(), searchRequest.getMaxRating()).get();
-            Query filterByPriceQuery = ElasticSearchUtil.rangeQuerySupplier("price", searchRequest.getStartingPrice(), searchRequest.getEndPrice()).get();
-            Supplier<Query> boolQuery = ElasticSearchUtil.boolQuerySupplier(Arrays.asList(filterByPriceQuery, filterByRatingQuery), Arrays.asList(mustQuerySupplier.get()));
-
-            return search(searchRequest, boolQuery);
-        } else if ((searchRequest.getStartingPrice() == null || searchRequest.getEndPrice() == null) &&
-                    (searchRequest.getMinRating() != null && searchRequest.getMaxRating() != null)) {
-            // Search by combining description and rating
-            Query filterByRatingQuery = ElasticSearchUtil.rangeQuerySupplier("rating", searchRequest.getMinRating(), searchRequest.getMaxRating()).get();
-            Supplier<Query> boolQuery = ElasticSearchUtil.boolQuerySupplier(Arrays.asList(filterByRatingQuery), Arrays.asList(mustQuerySupplier.get()));
-
-            return search(searchRequest, boolQuery);
-        } else if (searchRequest.getStartingPrice() != null && searchRequest.getEndPrice() != null){
-            // Search by combining description and pricing
-            Query filterByPriceQuery = ElasticSearchUtil.rangeQuerySupplier("price", searchRequest.getStartingPrice(), searchRequest.getEndPrice()).get();
-            Supplier<Query> boolQuery = ElasticSearchUtil.boolQuerySupplier(Arrays.asList(filterByPriceQuery), Arrays.asList(mustQuerySupplier.get()));
-
-            return search(searchRequest, boolQuery);
-        } else {
-            // Search only by Description
-            return search(searchRequest, mustQuerySupplier);
-        }
-    }
-
-    private List<Movie> search(SearchRequest request, Supplier<Query> supplier) throws IOException {
-        return elasticsearchClient.search(s -> s.index("movies")
-                .from(request.getPage() * request.getSize())
-                .size(request.getSize())
-                .query(supplier.get()),Movie.class)
-                .hits().hits().stream()
-                .map(hit -> hit.source()).collect(Collectors.toList());
     }
 }

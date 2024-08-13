@@ -23,10 +23,4 @@ public class MovieController {
                 .body(movieService.findAll());
     }
 
-    @GetMapping(path = "/")
-    public ResponseEntity search(@RequestBody @Valid SearchRequest searchRequest) throws IOException {
-        return ResponseEntity.status(HttpStatus.FOUND)
-                .body(movieService.search(searchRequest));
-    }
-
 }

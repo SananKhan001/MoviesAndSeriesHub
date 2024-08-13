@@ -3,9 +3,12 @@ package com.Search_Service.Search_Service.service;
 import com.Search_Service.Search_Service.entity.Movie;
 import com.Search_Service.Search_Service.entity.Series;
 import com.Search_Service.Search_Service.repository.SeriesRepository;
+import com.Search_Service.Search_Service.request.SearchRequest;
 import org.commonDTO.SeriesCreationMessage;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
+import java.util.List;
 
 @Service
 public class SeriesService {
