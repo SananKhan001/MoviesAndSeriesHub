@@ -29,7 +29,7 @@ public class Series {
     @Column(name = "genre", nullable = false)
     private String genre;
 
-    @Column(name = "series_description", nullable = false)
+    @Column(name = "series_description", nullable = false, length = 1200)
     private String description;
 
     // uuid

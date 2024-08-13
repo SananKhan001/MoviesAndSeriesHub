@@ -55,6 +55,19 @@ public class SearchService {
         }
     }
 
+    public List<String> autoSuggest(String partialName, IndexReference indexReference) throws IOException {
+        Supplier<Query> querySupplier = ElasticSearchUtil.autoSuggestMatchQuerySupplier("name", partialName);
+        String index = indexReference.equals(IndexReference.MOVIE_INDEX) ? "movies" : "series";
+
+        return elasticsearchClient.search(s -> s.index(index)
+                        .from(0)
+                        .size(10)
+                        .query(querySupplier.get()),Movie.class)
+                .hits().hits().stream()
+                .map(Hit::source).map(obj -> obj.getName()).collect(Collectors.toList());
+
+    }
+
     private List<?> search(SearchRequest request, Supplier<Query> supplier, String index) throws IOException {
         return elasticsearchClient.search(s -> s.index(index)
                         .from(request.getPage() * request.getSize())

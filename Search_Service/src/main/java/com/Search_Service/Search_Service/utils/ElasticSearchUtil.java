@@ -20,6 +20,10 @@ public class ElasticSearchUtil {
         return () -> Query.of(q -> q.range(rangeQuery(field, gte, lte)));
     }
 
+    public static Supplier<Query> autoSuggestMatchQuerySupplier(String field, String query) {
+        return () -> Query.of(q -> q.match(autoSuggestMatchQuery(field, query)));
+    }
+
     public static MatchQuery matchQuery(String field, String query){
         return new MatchQuery.Builder().field(field).query(query).build();
     }
@@ -30,5 +34,10 @@ public class ElasticSearchUtil {
 
     public static BoolQuery boolQuery(List<Query> filterQuery, List<Query> mustQuery){
         return new BoolQuery.Builder().filter(filterQuery).must(mustQuery).build();
+    }
+
+    public static MatchQuery autoSuggestMatchQuery(String field, String query) {
+        return new MatchQuery.Builder().field(field).query(query)
+                .analyzer("autocomplete_search").operator(Operator.Or).build();
     }
 }

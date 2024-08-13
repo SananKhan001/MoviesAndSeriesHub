@@ -49,7 +49,7 @@ public class MovieService {
          */
         streamBridge.send("MovieCreationMessageTopic", MovieCreationMessage.builder()
                 .id(movie.getId())
-                .name(movie.getName().toLowerCase())
+                .name(movie.getName())
                 .genre(movie.getGenre())
                 .description(movie.getDescription())
                 .searchableDescription(movie.getDescription().toLowerCase())

@@ -49,7 +49,7 @@ public class SeriesService {
          */
         streamBridge.send("SeriesCreationMessageTopic", SeriesCreationMessage.builder()
                 .id(series.getId())
-                .name(series.getName().toLowerCase())
+                .name(series.getName())
                 .genre(series.getGenre())
                 .description(series.getDescription())
                 .searchableDescription(series.getDescription().toLowerCase())

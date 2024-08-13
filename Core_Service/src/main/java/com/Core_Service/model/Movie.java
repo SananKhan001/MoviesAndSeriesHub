@@ -29,7 +29,7 @@ public class Movie {
     @Column(name = "genre", nullable = false)
     private String genre;
 
-    @Column(name = "movie_description", nullable = false)
+    @Column(name = "movie_description", nullable = false, length = 1200)
     private String description;
 
     // uuid
