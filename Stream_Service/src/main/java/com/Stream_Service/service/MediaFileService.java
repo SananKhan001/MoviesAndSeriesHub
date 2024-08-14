@@ -12,6 +12,7 @@ import com.Stream_Service.repository.EpisodeRepository;
 import com.Stream_Service.repository.MediaFileRepository;
 import com.Stream_Service.repository.UserMovieMappingRepository;
 import com.Stream_Service.repository.UserSeriesMappingRepository;
+import com.Stream_Service.utils.MediaUtils;
 import jakarta.annotation.PostConstruct;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,8 +20,11 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.ResourceLoader;
+import org.springframework.data.util.Pair;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpRange;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.http.codec.multipart.FilePart;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Mono;
@@ -189,7 +193,7 @@ public class MediaFileService {
                 });
     }
 
-    public Mono<Resource> getMovieVideo(String uniqueId) {
+    public Mono<ResponseEntity<Resource>> getMovieVideo(String uniqueId, String range) {
         User user = (User) SecurityContext.principal();
         return episodeRepository.findByUniquePosterId(uniqueId)
             .flatMap(episode -> {
@@ -202,8 +206,9 @@ public class MediaFileService {
                                     return Mono.fromCallable(() -> {
                                         Path path = Paths.get(mediaFile.getFilePath());
                                         if(Files.exists(path)) {
-                                            Resource resource = new FileSystemResource(path);
-                                            return resource;
+                                            return ResponseEntity.ok()
+                                                    .headers(MediaUtils.generateHeader(path, range))
+                                                    .body(MediaUtils.loadVideo(path, range));
                                         }
                                         else throw new FileNotFoundException("No file present at give path !!!");
                                     }).onErrorResume(FileNotFoundException.class, e -> Mono.error(new RuntimeException("Error Reading File", e)));
@@ -214,7 +219,7 @@ public class MediaFileService {
             });
     }
 
-    public Mono<Resource> getSeriesVideo(String uniqueId){
+    public Mono<ResponseEntity<Resource>> getSeriesVideo(String uniqueId, String range){
         User user = (User) SecurityContext.principal();
         return episodeRepository.findByUniquePosterId(uniqueId)
             .flatMap(episode -> {
@@ -227,8 +232,9 @@ public class MediaFileService {
                                     return Mono.fromCallable(() -> {
                                         Path path = Paths.get(mediaFile.getFilePath());
                                         if(Files.exists(path)) {
-                                            Resource resource = new FileSystemResource(path);
-                                            return resource;
+                                            return ResponseEntity.ok()
+                                                    .headers(MediaUtils.generateHeader(path, range))
+                                                    .body(MediaUtils.loadVideo(path, range));
                                         }
                                         else throw new FileNotFoundException("No file present at give path !!!");
                                     }).onErrorResume(FileNotFoundException.class, e -> Mono.error(new RuntimeException("Error Reading File", e)));

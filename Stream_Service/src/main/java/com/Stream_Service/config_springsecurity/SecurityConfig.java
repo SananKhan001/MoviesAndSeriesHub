@@ -31,7 +31,7 @@ public class SecurityConfig {
                 .authorizeExchange(exchanges ->
                     {
                         exchanges.pathMatchers("/poster/upload/**", "/video/upload/**", "/delete/media/**").hasAuthority(Authority.ADMIN.toString());
-                        exchanges.pathMatchers("/poster/get/**", "/profile/**", "/movie/stream/**", "/series/stream/**").authenticated();
+                        exchanges.pathMatchers("/poster/get/**", "/profile/**", "/movie/stream/**", "/series/stream/**").permitAll();
 
                         exchanges.anyExchange().permitAll();
                     }
@@ -39,7 +39,6 @@ public class SecurityConfig {
                 .addFilterAt(jwtFilter, SecurityWebFiltersOrder.AUTHENTICATION)
                 .httpBasic().disable()
                 .formLogin().disable()
-                .cors().disable()
                 .csrf().disable();
 
         return http.build();

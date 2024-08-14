@@ -8,6 +8,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.Resource;
 import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.codec.multipart.FilePart;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -83,13 +84,13 @@ public class MediaController {
     }
 
     @GetMapping("/movie/stream/{uniqueId}")
-    public Mono<Resource> streamMovieVideo(@PathVariable("uniqueId") String uniqueId) throws IOException {
-        return mediaFileService.getMovieVideo(uniqueId);
+    public Mono<ResponseEntity<Resource>> streamMovieVideo(@PathVariable("uniqueId") String uniqueId, @RequestHeader("Range") String range) throws IOException {
+        return mediaFileService.getMovieVideo(uniqueId, range);
     }
 
     @GetMapping("/series/stream/{uniqueId}")
-    public Mono<Resource> streamSeriesVideo(@PathVariable("uniqueId") String uniqueId) throws IOException {
-        return mediaFileService.getSeriesVideo(uniqueId);
+    public Mono<ResponseEntity<Resource>> streamSeriesVideo(@PathVariable("uniqueId") String uniqueId, @RequestHeader("Range") String range) throws IOException {
+        return mediaFileService.getSeriesVideo(uniqueId, range);
     }
 
     @DeleteMapping("/delete/media/{uniqueId}")
