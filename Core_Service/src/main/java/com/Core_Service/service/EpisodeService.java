@@ -5,13 +5,19 @@ import com.Core_Service.custom_exceptions.NoMovieFoundException;
 import com.Core_Service.custom_exceptions.NoSeriesFoundException;
 import com.Core_Service.helpers.Helper;
 import com.Core_Service.model.Episode;
+import com.Core_Service.model.Movie;
 import com.Core_Service.model.Series;
 import com.Core_Service.model_response.EpisodeResponse;
 import com.Core_Service.repository.EpisodeRepository;
 import com.Core_Service.repository.MovieRepository;
+import com.Core_Service.repository.RedisCacheRepository;
 import com.Core_Service.repository.SeriesRepository;
 import org.commonDTO.EpisodeCreationMessage;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.CacheConfig;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
+import org.springframework.cache.annotation.EnableCaching;
 import org.springframework.cloud.stream.function.StreamBridge;
 import org.springframework.stereotype.Service;
 
@@ -19,6 +25,8 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @Service
+@EnableCaching
+@CacheConfig(cacheManager = "customCacheManager", cacheNames = "episode_cache")
 public class EpisodeService {
 
     @Autowired
@@ -36,11 +44,17 @@ public class EpisodeService {
     @Autowired
     private StreamBridge streamBridge;
 
+    @Autowired
+    private RedisCacheRepository cacheRepository;
+
     public EpisodeResponse createEpisodeForMovie(String episodeName, Long movieId) {
         Episode episode = Episode.builder().episodeName(episodeName)
                 .uniquePosterId(Helper.generateUUID())
                 .belongsToMovie(movieRepository.findById(movieId).get()).build();
         episode = episodeRepository.save(episode);
+
+        cacheRepository.deleteEpisodeCacheByEpisodeId(episode.getId());
+        cacheRepository.deleteEpisodeCacheByMovieId(movieId);
 
         /**                                  ------------------------------
          *  EpisodeCreationMessage ======>>>| EpisodeCreationMessageTopic |
@@ -54,12 +68,14 @@ public class EpisodeService {
         return episode.to();
     }
 
+    @Cacheable(key = "'episodeId::' + #episodeId")
     public EpisodeResponse getEpisodeById(Long episodeId) throws NoEpisodeFoundException {
         return episodeRepository.findById(episodeId)
                 .orElseThrow(() -> new NoEpisodeFoundException("There are no episode with provided id !!!"))
                 .to();
     }
 
+    @Cacheable(key = "'movieId::' + '#movieId'")
     public EpisodeResponse getEpisodeByMovieId(Long movieId) throws NoMovieFoundException {
         return episodeRepository.findByBelongsToMovie(movieId)
                 .orElseThrow(() -> new NoMovieFoundException("No episode found by provided movieId !!!"))
@@ -70,18 +86,32 @@ public class EpisodeService {
         Episode episode = episodeRepository.findById(episodeId)
                 .orElseThrow(() -> new NoEpisodeFoundException("No such episode found !!!"));
         episode.setEpisodeName(episodeName);
-        return episodeRepository.save(episode).to();
+        episode = episodeRepository.save(episode);
+
+        cacheRepository.deleteEpisodeCacheByEpisodeId(episodeId);
+        Movie movie = episode.getBelongsToMovie();
+        Series series = episode.getBelongsToSeries();
+        if(movie != null) cacheRepository.deleteEpisodeCacheByMovieId(movie.getId());
+        else cacheRepository.deleteEpisodeCacheBySeriesId(series.getId());
+
+        return episode.to();
     }
 
     public Boolean deleteEpisode(Long episodeId) throws NoEpisodeFoundException {
+        Episode episode = episodeRepository.findById(episodeId)
+                .orElseThrow(() -> new NoEpisodeFoundException("No Episode found with given id !!!"));
 
         /**                                  ------------------------------
          *  EpisodeCreationMessage ======>>>| EpisodeDeletionMessageTopic |
          *                                  ------------------------------
          */
-        streamBridge.send("EpisodeDeletionMessageTopic", episodeRepository.findById(episodeId)
-                .orElseThrow(() -> new NoEpisodeFoundException("No episode found with given id !!!"))
-                .getUniquePosterId());
+        streamBridge.send("EpisodeDeletionMessageTopic", episode.getUniquePosterId());
+
+        Movie movie = episode.getBelongsToMovie();
+        Series series = episode.getBelongsToSeries();
+        cacheRepository.deleteEpisodeCacheByEpisodeId(episodeId);
+        if(movie != null) cacheRepository.deleteEpisodeCacheByMovieId(movie.getId());
+        else cacheRepository.deleteEpisodeCacheBySeriesId(series.getId());
 
         episodeRepository.deleteById(episodeId);
         return true;
@@ -97,6 +127,9 @@ public class EpisodeService {
                 .build();
         episode = episodeRepository.save(episode);
 
+        cacheRepository.deleteEpisodeCacheByEpisodeId(episode.getId());
+        cacheRepository.deleteEpisodeCacheBySeriesId(seriesId);
+
         /**                                  ------------------------------
          *  EpisodeCreationMessage ======>>>| EpisodeCreationMessageTopic |
          *                                  ------------------------------
@@ -110,6 +143,7 @@ public class EpisodeService {
         return episode.to();
     }
 
+    @Cacheable(key = "'seriesId::' + #seriesId")
     public List<EpisodeResponse> getEpisodeBySeriesId(Long seriesId) {
         return episodeRepository.findAllBySeriesId(seriesId)
                 .stream()

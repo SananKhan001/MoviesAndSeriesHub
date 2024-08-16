@@ -48,16 +48,16 @@ services:
       - KAFKA_CFG_LISTENER_SECURITY_PROTOCOL_MAP=CONTROLLER:PLAINTEXT,EXTERNAL:PLAINTEXT,PLAINTEXT:PLAINTEXT
     depends_on:
       - zookeeper
-#
-#  redis-stack:
-#    image: redis/redis-stack-server:latest
-#    container_name: redis_server
-#    restart: always
-#    environment:
-#      - REDIS_ARGS=--requirepass root
-#    ports:
-#      - "6379:6379"
-#
+
+  redis-stack:
+    image: redis/redis-stack-server:latest
+    container_name: redis_server
+    restart: always
+    environment:
+      - REDIS_ARGS=--requirepass root
+    ports:
+      - "6379:6379"
+
 volumes:
   zookeeper_data:
     driver: local

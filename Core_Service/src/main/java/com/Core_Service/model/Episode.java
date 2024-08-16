@@ -7,6 +7,7 @@ import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
 
+import java.io.Serializable;
 import java.util.Date;
 
 @Data
@@ -17,7 +18,7 @@ import java.util.Date;
 @EqualsAndHashCode
 @Entity
 @Table(name = "episodes")
-public class Episode {
+public class Episode implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;

@@ -16,6 +16,8 @@ import com.Core_Service.repository.ReviewRepository;
 import org.commonDTO.MovieBuyMessage;
 import org.commonDTO.MovieCreationMessage;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.Cacheable;
+import org.springframework.cache.annotation.EnableCaching;
 import org.springframework.cloud.stream.function.StreamBridge;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -25,6 +27,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @Service
+@EnableCaching
 public class MovieService {
 
     @Autowired
@@ -100,7 +103,13 @@ public class MovieService {
                 .to();
     }
 
+    @Cacheable(
+            cacheNames = "latestContent",
+            key = "'series' + '::' + #genre + '::' + #pageRequest.getPageNumber() + '::' + #pageRequest.getPageSize()",
+            cacheManager = "customCacheManager"
+    )
     public List<MovieResponse> getNewReleaseMoviesByGenre(String genre, Pageable pageRequest) {
+        System.out.println("Fetched from database !!!");
         return movieRepository.findNewReleaseMoviesByGenre(genre, pageRequest)
                 .stream()
                 .map(Movie::to).collect(Collectors.toList());

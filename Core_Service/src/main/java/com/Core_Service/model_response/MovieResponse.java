@@ -2,8 +2,10 @@ package com.Core_Service.model_response;
 
 import lombok.Builder;
 
+import java.io.Serializable;
+
 @Builder
-public class MovieResponse {
+public class MovieResponse implements Serializable {
     private Long movieId;
     private String name;
     private String genre;
