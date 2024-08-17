@@ -1,4 +1,4 @@
-package com.Core_Service.repository;
+package com.Core_Service.repository.db_repository;
 
 import com.Core_Service.model.User;
 import org.springframework.data.jpa.repository.JpaRepository;

@@ -1,9 +1,8 @@
-package com.Core_Service.repository;
+package com.Core_Service.repository.db_repository;
 
 import com.Core_Service.model.Movie;
 import com.Core_Service.model.Review;
 import com.Core_Service.model.Series;
-import com.Core_Service.model_response.ReviewResponse;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;

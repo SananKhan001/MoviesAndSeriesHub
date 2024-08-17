@@ -3,7 +3,7 @@ package com.Core_Service.service;
 import com.Core_Service.enums.Authorities;
 import com.Core_Service.model.User;
 import com.Core_Service.model_request.UserCreateRequest;
-import com.Core_Service.repository.UserRepository;
+import com.Core_Service.repository.db_repository.UserRepository;
 import org.commonDTO.UserCreationMessage;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cloud.stream.function.StreamBridge;

@@ -10,12 +10,15 @@ import com.Core_Service.model_request.ReviewCreateRequest;
 import com.Core_Service.model_request.SeriesCreateRequest;
 import com.Core_Service.model_response.ReviewResponse;
 import com.Core_Service.model_response.SeriesResponse;
-import com.Core_Service.repository.ReviewRepository;
-import com.Core_Service.repository.SeriesRepository;
-import org.commonDTO.MovieCreationMessage;
+import com.Core_Service.repository.cache_repository.SeriesCacheRepository;
+import com.Core_Service.repository.db_repository.ReviewRepository;
+import com.Core_Service.repository.db_repository.SeriesRepository;
 import org.commonDTO.SeriesBuyMessage;
 import org.commonDTO.SeriesCreationMessage;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.CacheConfig;
+import org.springframework.cache.annotation.Cacheable;
+import org.springframework.cache.annotation.EnableCaching;
 import org.springframework.cloud.stream.function.StreamBridge;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -25,6 +28,8 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @Service
+@EnableCaching
+@CacheConfig(cacheNames = "series_cache", cacheManager = "customCacheManager")
 public class SeriesService {
 
     @Autowired
@@ -36,12 +41,18 @@ public class SeriesService {
     @Autowired
     private ReviewRepository reviewRepository;
 
+    @Autowired
+    private SeriesCacheRepository cacheRepository;
+
     public SeriesResponse addSeries(SeriesCreateRequest seriesCreateRequest) {
         Series series = Series.builder().name(seriesCreateRequest.getName())
                 .genre(seriesCreateRequest.getGenre().toString())
                 .description(seriesCreateRequest.getDescription())
                 .uniquePosterId(Helper.generateUUID()).price(seriesCreateRequest.getPrice()).build();
         series = seriesRepository.save(series);
+
+        cacheRepository.clearCacheBySeriesId(series.getId());
+        cacheRepository.clearCacheBySeriesGenre(series.getGenre());
 
         /**                                  -----------------------------
          *  SeriesCreationMessage ======>>> | SeriesCreationMessageTopic |
@@ -64,6 +75,7 @@ public class SeriesService {
         return series.to();
     }
 
+    @Cacheable(key = "'series::' + #seriesId")
     public SeriesResponse getSeriesById(Long seriesId) throws NoSeriesFoundException {
         return seriesRepository.findById(seriesId)
                 .orElseThrow(() -> new NoSeriesFoundException("No series found with provide Id !!!"))
@@ -77,7 +89,12 @@ public class SeriesService {
         series.setGenre(seriesCreateRequest.getGenre().toString());
         series.setDescription(seriesCreateRequest.getDescription());
         series.setPrice(seriesCreateRequest.getPrice());
-        return seriesRepository.save(series).to();
+        series = seriesRepository.save(series);
+
+        cacheRepository.clearCacheBySeriesId(series.getId());
+        cacheRepository.clearCacheBySeriesGenre(series.getGenre());
+
+        return series.to();
     }
 
     public Boolean deleteSeries(Long seriesId) throws NoSeriesFoundException {
@@ -99,15 +116,25 @@ public class SeriesService {
          */
         streamBridge.send("SeriesDeletionMessageTopic", seriesId);
 
+        cacheRepository.clearCacheBySeriesId(series.getId());
+        cacheRepository.clearCacheBySeriesGenre(series.getGenre());
+        cacheRepository.clearCacheBySeriesReview(series.getId());
+
         seriesRepository.deleteById(seriesId);
         return true;
     }
+
+    @Cacheable(
+            cacheNames = "'latest_series::' + #genre",
+            key = "'series::' + #genre + '::' + #pageRequest.getPageNumber() + '::' + #pageRequest.getPageSize()"
+    )
     public List<SeriesResponse> getNewReleaseSeriesByGenre(Genre genre, Pageable pageRequest) {
         return seriesRepository.findByNewReleaseSeriesByGenre(genre.toString(), pageRequest)
                 .stream()
                 .map(x -> x.to()).collect(Collectors.toList());
     }
 
+    // TODO:: Revisit for caching
     public String assignSeriesToCurrentUser(Long seriesId) throws NoSeriesFoundException {
         User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         Viewer viewer = user.getViewer();
@@ -156,6 +183,10 @@ public class SeriesService {
             series.setRating(newAvgRating);
             series = seriesRepository.save(series);
 
+            cacheRepository.clearCacheBySeriesId(series.getId());
+            cacheRepository.clearCacheBySeriesGenre(series.getGenre());
+            cacheRepository.clearCacheBySeriesReview(series.getId());
+
             /**                                  -----------------------------
              *  SeriesCreationMessage ======>>> | SeriesUpdationMessageTopic |
              *                                  -----------------------------
@@ -180,10 +211,14 @@ public class SeriesService {
         throw new NoSeriesFoundException("This Series is not in list of user !!!");
     }
 
+    @Cacheable(
+            cacheNames = "'series_review::' + #seriesId",
+            key = "'series::rating::' + #seriesId + '::' + #pageRequest.getPageNumber() + '::' + #pageRequest.getPageSize()"
+    )
     public List<ReviewResponse> getReviewsOfMovie(Long seriesId, Pageable pageRequest) throws NoMovieFoundException {
         Series series = seriesRepository.findById(seriesId)
                 .orElseThrow(() -> new NoMovieFoundException("No movie found with given id !!!"));
         return reviewRepository.findByReviewForSeries(series, pageRequest).get()
-                .stream().map(review -> review.to()).collect(Collectors.toList());
+                .stream().map(Review::to).collect(Collectors.toList());
     }
 }

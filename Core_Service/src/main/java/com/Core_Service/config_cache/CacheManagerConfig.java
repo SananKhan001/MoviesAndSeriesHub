@@ -16,17 +16,30 @@ public class CacheManagerConfig {
     @Value("${redis.ttl.episode_cache}")
     private String episodeCacheTTL;
 
+    @Value("${redis.ttl.movie_cache}")
+    private String movieCacheTTL;
+
+    @Value("${redis.ttl.series_cache}")
+    private String seriesCacheTTL;
+
+    @Value("${redis.ttl.default}")
+    private String defaultTTL;
+
     @Bean(name = "customCacheManager")
     public CacheManager cacheManager(RedisConnectionFactory connectionFactory) {
         return RedisCacheManager.RedisCacheManagerBuilder
                 .fromConnectionFactory(connectionFactory)
-                .withCacheConfiguration("latestContent",
-                        RedisCacheConfiguration.defaultCacheConfig()
-                                .entryTtl(Duration.ofMinutes(1)) // TTL set to 10 minutes
-                )
                 .withCacheConfiguration("episode_cache",
                         RedisCacheConfiguration.defaultCacheConfig()
                                 .entryTtl(Duration.ofMinutes(Long.parseLong(episodeCacheTTL))))
+                .withCacheConfiguration("movie_cache",
+                        RedisCacheConfiguration.defaultCacheConfig()
+                                .entryTtl(Duration.ofMinutes(Long.parseLong(movieCacheTTL))))
+                .withCacheConfiguration("series_cache",
+                        RedisCacheConfiguration.defaultCacheConfig()
+                                .entryTtl(Duration.ofMinutes(Long.parseLong(seriesCacheTTL))))
+                .cacheDefaults(RedisCacheConfiguration.defaultCacheConfig()
+                        .entryTtl(Duration.ofMinutes(Long.parseLong(defaultTTL))))
                 .build();
     }
 }

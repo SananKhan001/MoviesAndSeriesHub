@@ -11,11 +11,14 @@ import com.Core_Service.model_request.MovieCreateRequest;
 import com.Core_Service.model_request.ReviewCreateRequest;
 import com.Core_Service.model_response.MovieResponse;
 import com.Core_Service.model_response.ReviewResponse;
-import com.Core_Service.repository.MovieRepository;
-import com.Core_Service.repository.ReviewRepository;
+import com.Core_Service.repository.cache_repository.MovieCacheRepository;
+import com.Core_Service.repository.db_repository.MovieRepository;
+import com.Core_Service.repository.cache_repository.EpisodeCacheRepository;
+import com.Core_Service.repository.db_repository.ReviewRepository;
 import org.commonDTO.MovieBuyMessage;
 import org.commonDTO.MovieCreationMessage;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.CacheConfig;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.cache.annotation.EnableCaching;
 import org.springframework.cloud.stream.function.StreamBridge;
@@ -28,6 +31,7 @@ import java.util.stream.Collectors;
 
 @Service
 @EnableCaching
+@CacheConfig(cacheNames = "movie_cache", cacheManager = "customCacheManager")
 public class MovieService {
 
     @Autowired
@@ -39,12 +43,18 @@ public class MovieService {
     @Autowired
     private ReviewRepository reviewRepository;
 
+    @Autowired
+    private MovieCacheRepository cacheRepository;
+
     public MovieResponse addMovie(MovieCreateRequest movieCreateRequest){
         Movie movie = Movie.builder().name(movieCreateRequest.getName())
                 .genre(movieCreateRequest.getGenre().toString()).description(movieCreateRequest.getDescription())
                 .uniquePosterId(Helper.generateUUID()).price(movieCreateRequest.getPrice())
                 .build();
         movie = movieRepository.save(movie);
+
+        cacheRepository.clearCacheByMovieId(movie.getId());
+        cacheRepository.clearCacheByMovieGenre(movie.getGenre());
 
         /**                                 ----------------------------
          *  MovieCreationMessage ======>>> | MovieCreationMessageTopic |
@@ -74,7 +84,12 @@ public class MovieService {
         movie.setGenre(movieCreateRequest.getGenre().toString());
         movie.setDescription(movieCreateRequest.getDescription());
         movie.setPrice(movieCreateRequest.getPrice());
-        return movieRepository.save(movie).to();
+        movie = movieRepository.save(movie);
+
+        cacheRepository.clearCacheByMovieId(movie.getId());
+        cacheRepository.clearCacheByMovieGenre(movie.getGenre());
+
+        return movie.to();
     }
 
     public Boolean deleteMovie(Long movieId) throws NoMovieFoundException {
@@ -94,9 +109,15 @@ public class MovieService {
         streamBridge.send("MovieDeletionMessageTopic", movieId);
 
         movieRepository.delete(movie);
+
+        cacheRepository.clearCacheByMovieId(movie.getId());
+        cacheRepository.clearCacheByMovieGenre(movie.getGenre());
+        cacheRepository.clearCacheByMovieReview(movieId);
+
         return true;
     }
 
+    @Cacheable(key = "'movie::' + #movieId")
     public MovieResponse getMovieById(Long movieId) throws NoMovieFoundException {
         return movieRepository.findById(movieId)
                 .orElseThrow(() -> new NoMovieFoundException("No movie found with given id !!"))
@@ -104,17 +125,16 @@ public class MovieService {
     }
 
     @Cacheable(
-            cacheNames = "latestContent",
-            key = "'series' + '::' + #genre + '::' + #pageRequest.getPageNumber() + '::' + #pageRequest.getPageSize()",
-            cacheManager = "customCacheManager"
+            cacheNames = "'latest_movies::' + #genre",
+            key = "'movie::' + #genre + '::' + #pageRequest.getPageNumber() + '::' + #pageRequest.getPageSize()"
     )
     public List<MovieResponse> getNewReleaseMoviesByGenre(String genre, Pageable pageRequest) {
-        System.out.println("Fetched from database !!!");
         return movieRepository.findNewReleaseMoviesByGenre(genre, pageRequest)
                 .stream()
                 .map(Movie::to).collect(Collectors.toList());
     }
 
+    // TODO:: Revisit for caching
     public String assignMovieToCurrentUser(Long movieId) throws NoMovieFoundException {
         User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         Viewer viewer = user.getViewer();
@@ -182,13 +202,22 @@ public class MovieService {
                     .createdAt(movie.getCreatedAt())
                     .build());
 
+            cacheRepository.clearCacheByMovieId(movie.getId());
+            cacheRepository.clearCacheByMovieGenre(movie.getGenre());
+            cacheRepository.clearCacheByMovieReview(movie.getId());
+
             return review.to();
         }
 
         throw new NoMovieFoundException("This Movie is not in list of user !!!");
     }
 
+    @Cacheable(
+            cacheNames = "'movie_review::' + #movieId",
+            key = "'movie::rating::' + #movieId + '::' + #pageRequest.getPageNumber() + '::' + #pageRequest.getPageSize()"
+    )
     public List<ReviewResponse> getReviewsOfMovie(Long movieId, Pageable pageRequest) throws NoMovieFoundException {
+
         Movie movie = movieRepository.findById(movieId)
                 .orElseThrow(() -> new NoMovieFoundException("No movie found with given id !!!"));
         return reviewRepository.findByReviewForMovie(movie, pageRequest).get()

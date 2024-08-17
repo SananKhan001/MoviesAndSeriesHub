@@ -8,14 +8,13 @@ import com.Core_Service.model.Episode;
 import com.Core_Service.model.Movie;
 import com.Core_Service.model.Series;
 import com.Core_Service.model_response.EpisodeResponse;
-import com.Core_Service.repository.EpisodeRepository;
-import com.Core_Service.repository.MovieRepository;
-import com.Core_Service.repository.RedisCacheRepository;
-import com.Core_Service.repository.SeriesRepository;
+import com.Core_Service.repository.db_repository.EpisodeRepository;
+import com.Core_Service.repository.db_repository.MovieRepository;
+import com.Core_Service.repository.cache_repository.EpisodeCacheRepository;
+import com.Core_Service.repository.db_repository.SeriesRepository;
 import org.commonDTO.EpisodeCreationMessage;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.CacheConfig;
-import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.cache.annotation.EnableCaching;
 import org.springframework.cloud.stream.function.StreamBridge;
@@ -45,7 +44,7 @@ public class EpisodeService {
     private StreamBridge streamBridge;
 
     @Autowired
-    private RedisCacheRepository cacheRepository;
+    private EpisodeCacheRepository cacheRepository;
 
     public EpisodeResponse createEpisodeForMovie(String episodeName, Long movieId) {
         Episode episode = Episode.builder().episodeName(episodeName)

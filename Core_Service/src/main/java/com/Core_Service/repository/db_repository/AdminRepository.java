@@ -1,8 +1,6 @@
-package com.Core_Service.repository;
+package com.Core_Service.repository.db_repository;
 
 import com.Core_Service.model.Admin;
-import com.Core_Service.model.Viewer;
-import jdk.jfr.Registered;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
