@@ -7,8 +7,12 @@ import com.Core_Service.model.Viewer;
 import com.Core_Service.model_request.UserCreateRequest;
 import com.Core_Service.model_request.ViewerCreateRequest;
 import com.Core_Service.model_response.UserResponse;
+import com.Core_Service.repository.cache_repository.ViewerServiceCacheRepository;
 import com.Core_Service.repository.db_repository.ViewerRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.CacheConfig;
+import org.springframework.cache.annotation.Cacheable;
+import org.springframework.cache.annotation.EnableCaching;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
@@ -20,6 +24,8 @@ import java.util.stream.Collectors;
 
 @Service
 @EnableTransactionManagement
+@EnableCaching
+@CacheConfig(cacheNames = "viewer_service_cache", cacheManager = "customCacheManager")
 public class ViewerService {
 
     @Autowired
@@ -27,6 +33,9 @@ public class ViewerService {
 
     @Autowired
     private UserService userService;
+
+    @Autowired
+    private ViewerServiceCacheRepository cacheRepository;
 
     @Transactional
     public UserResponse createViewer(ViewerCreateRequest viewerCreateRequest){
@@ -36,14 +45,22 @@ public class ViewerService {
         viewer.setUser(user);
         viewer.setUniqueProfileId(Helper.generateUUID());
         viewerRepository.save(viewer);
+
+        cacheRepository.clearCacheViewerList();
+
         return user.to(viewer);
     }
 
+    @Cacheable(
+            key = "'viewer::list::' + #pageRequest.getPageNumber() + '::' + #pageRequest.getPageSize()",
+            cacheNames = "viewer_list"
+    )
     public List<UserResponse> findAllViewerDescOrderById(Pageable pageRequest) {
         return viewerRepository.findAllViewerDescOrderById(pageRequest).getContent()
                 .stream().map(x -> x.getUser().to(x)).collect(Collectors.toList());
     }
 
+    @Cacheable(key = "'USER::' + #userId")
     public UserResponse findById(Long userId) throws NoUserFoundException {
         Viewer viewer = viewerRepository.findById(userId)
                         .orElseThrow(() -> new NoUserFoundException("No Viewer Found With Provided Id !!!"));

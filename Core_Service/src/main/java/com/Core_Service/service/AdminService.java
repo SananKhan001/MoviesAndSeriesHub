@@ -7,8 +7,12 @@ import com.Core_Service.model.User;
 import com.Core_Service.model_request.AdminCreateRequest;
 import com.Core_Service.model_request.UserCreateRequest;
 import com.Core_Service.model_response.UserResponse;
+import com.Core_Service.repository.cache_repository.AdminServiceCacheRepository;
 import com.Core_Service.repository.db_repository.AdminRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.CacheConfig;
+import org.springframework.cache.annotation.Cacheable;
+import org.springframework.cache.annotation.EnableCaching;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
@@ -20,6 +24,8 @@ import java.util.stream.Collectors;
 
 @Service
 @EnableTransactionManagement
+@EnableCaching
+@CacheConfig(cacheNames = "admin_service_cache", cacheManager = "customCacheManager")
 public class AdminService {
 
     @Autowired
@@ -27,6 +33,9 @@ public class AdminService {
 
     @Autowired
     private UserService userService;
+
+    @Autowired
+    private AdminServiceCacheRepository cacheRepository;
 
     @Transactional
     public UserResponse createAdmin(AdminCreateRequest adminCreateRequest){
@@ -36,14 +45,22 @@ public class AdminService {
         admin.setUser(user);
         admin.setUniqueProfileId(Helper.generateUUID());
         adminRepository.save(admin);
+
+        cacheRepository.clearCacheAdminList();
+
         return user.to(admin);
     }
 
-    public List<UserResponse> findAllViewerDescOrderById(Pageable pageRequest) {
+    @Cacheable(
+            key = "'admin::list::' + #pageRequest.getPageNumber() + '::' + #pageRequest.getPageSize()",
+            cacheNames = "admin_list"
+    )
+    public List<UserResponse> findAllAdminDescOrderById(Pageable pageRequest) {
         return adminRepository.findAllAdminsDescOrderById(pageRequest).getContent()
                 .stream().map(x -> x.getUser().to(x)).collect(Collectors.toList());
     }
 
+    @Cacheable(key = "'USER::' + #userId")
     public UserResponse findById(Long userId) throws NoUserFoundException {
         Admin admin = adminRepository.findById(userId)
                 .orElseThrow(() -> new NoUserFoundException("No Admin Found With Provided Id !!!"));

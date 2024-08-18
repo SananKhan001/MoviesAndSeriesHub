@@ -6,6 +6,9 @@ import com.Core_Service.model_request.UserCreateRequest;
 import com.Core_Service.repository.db_repository.UserRepository;
 import org.commonDTO.UserCreationMessage;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.CacheConfig;
+import org.springframework.cache.annotation.Cacheable;
+import org.springframework.cache.annotation.EnableCaching;
 import org.springframework.cloud.stream.function.StreamBridge;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -17,6 +20,8 @@ import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @EnableTransactionManagement
+@EnableCaching
+@CacheConfig(cacheNames = "user_details_cache", cacheManager = "customCacheManager")
 public class UserService implements UserDetailsManager {
 
     @Autowired
@@ -80,6 +85,7 @@ public class UserService implements UserDetailsManager {
         return userRepository.findByUsername(username).isPresent();
     }
 
+    @Cacheable(key = "'USER::' + #username")
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
         // TODO:: user should first load from cache

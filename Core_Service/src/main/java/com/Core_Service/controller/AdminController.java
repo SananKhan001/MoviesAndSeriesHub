@@ -30,7 +30,7 @@ public class AdminController {
                                                         @Min(value = 1, message = "page size should not be less than 1")
                                                         int size){
         Pageable pageRequest = PageRequest.of(page, size);
-        return adminService.findAllViewerDescOrderById(pageRequest);
+        return adminService.findAllAdminDescOrderById(pageRequest);
     }
 
     @QueryMapping(name = "findAdminsByUserId")

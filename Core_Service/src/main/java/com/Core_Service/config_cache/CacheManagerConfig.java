@@ -22,6 +22,15 @@ public class CacheManagerConfig {
     @Value("${redis.ttl.series_cache}")
     private String seriesCacheTTL;
 
+    @Value("${redis.ttl.user_details_cache}")
+    private String userDetailsTTL;
+
+    @Value("${redis.ttl.admin_service_cache}")
+    private String adminServiceCache;
+
+    @Value("${redis.ttl.viewer_service_cache}")
+    private String viewerServiceCache;
+
     @Value("${redis.ttl.default}")
     private String defaultTTL;
 
@@ -38,6 +47,15 @@ public class CacheManagerConfig {
                 .withCacheConfiguration("series_cache",
                         RedisCacheConfiguration.defaultCacheConfig()
                                 .entryTtl(Duration.ofMinutes(Long.parseLong(seriesCacheTTL))))
+                .withCacheConfiguration("user_details_cache",
+                        RedisCacheConfiguration.defaultCacheConfig()
+                                .entryTtl(Duration.ofMinutes(Long.parseLong(userDetailsTTL))))
+                .withCacheConfiguration("admin_service_cache",
+                        RedisCacheConfiguration.defaultCacheConfig()
+                                .entryTtl(Duration.ofMinutes(Long.parseLong(adminServiceCache))))
+                .withCacheConfiguration("viewer_service_cache",
+                        RedisCacheConfiguration.defaultCacheConfig()
+                                .entryTtl(Duration.ofMinutes(Long.parseLong(viewerServiceCache))))
                 .cacheDefaults(RedisCacheConfiguration.defaultCacheConfig()
                         .entryTtl(Duration.ofMinutes(Long.parseLong(defaultTTL))))
                 .build();
