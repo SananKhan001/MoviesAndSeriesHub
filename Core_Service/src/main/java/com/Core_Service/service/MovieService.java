@@ -89,6 +89,24 @@ public class MovieService {
         cacheRepository.clearCacheByMovieId(movie.getId());
         cacheRepository.clearCacheByMovieGenre(movie.getGenre());
 
+        /**                                 ----------------------------
+         *  MovieCreationMessage ======>>> | MovieUpdationMessageTopic |
+         *                                 ----------------------------
+         */
+        streamBridge.send("MovieUpdationMessageTopic", MovieCreationMessage.builder()
+                .id(movie.getId())
+                .name(movie.getName())
+                .genre(movie.getGenre())
+                .description(movie.getDescription())
+                .searchableDescription(movie.getDescription().toLowerCase())
+                .posterURL(
+                        StreamServiceDetails.STREAM_SERVER_URL + StreamServiceDetails.MEDIA_URI_GET_POSTER_PATH + movie.getUniquePosterId()
+                )
+                .price(movie.getPrice())
+                .rating(movie.getRating() == null ? -1 : movie.getRating())
+                .createdAt(movie.getCreatedAt())
+                .build());
+
         return movie.to();
     }
 

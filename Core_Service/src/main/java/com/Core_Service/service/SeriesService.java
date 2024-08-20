@@ -94,6 +94,24 @@ public class SeriesService {
         cacheRepository.clearCacheBySeriesId(series.getId());
         cacheRepository.clearCacheBySeriesGenre(series.getGenre());
 
+        /**                                  -----------------------------
+         *  SeriesCreationMessage ======>>> | SeriesUpdationMessageTopic |
+         *                                  -----------------------------
+         */
+        streamBridge.send("SeriesUpdationMessageTopic", SeriesCreationMessage.builder()
+                .id(series.getId())
+                .name(series.getName())
+                .genre(series.getGenre())
+                .description(series.getDescription())
+                .searchableDescription(series.getDescription().toLowerCase())
+                .posterURL(
+                        StreamServiceDetails.STREAM_SERVER_URL + StreamServiceDetails.MEDIA_URI_GET_POSTER_PATH + series.getUniquePosterId()
+                )
+                .price(series.getPrice())
+                .rating(series.getRating() == null ? -1 : series.getRating())
+                .createdAt(series.getCreatedAt())
+                .build());
+
         return series.to();
     }
 
