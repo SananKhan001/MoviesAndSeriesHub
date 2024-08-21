@@ -10,10 +10,10 @@ import java.io.Serializable;
 @AllArgsConstructor
 @NoArgsConstructor
 public class TransactionDetails implements Serializable {
-    private String TransactionId;
+    private String transactionId;
     private String contentType; // Movie or Series
-    private String contentId;
-    private String userId;
+    private Long contentId;
+    private Long userId;
     private String contentName;
     private int paidAmount;
 }

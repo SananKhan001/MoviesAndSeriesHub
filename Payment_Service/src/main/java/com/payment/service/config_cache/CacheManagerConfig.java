@@ -17,10 +17,15 @@ public class CacheManagerConfig {
     @Value("${redis.ttl.default}")
     private String defaultTTL;
 
+    @Value("${redis.ttl.payment_cache_repository}")
+    private String paymentCacheTTL;
+
     @Bean(name = "customPaymentCacheManager")
     public CacheManager cacheManager(RedisConnectionFactory connectionFactory) {
         return RedisCacheManager.RedisCacheManagerBuilder
                 .fromConnectionFactory(connectionFactory)
+                .withCacheConfiguration("payment_cache_repository", RedisCacheConfiguration
+                        .defaultCacheConfig().entryTtl(Duration.ofMinutes(Long.parseLong(paymentCacheTTL))))
                 .cacheDefaults(RedisCacheConfiguration.defaultCacheConfig()
                         .entryTtl(Duration.ofMinutes(Long.parseLong(defaultTTL))))
                 .build();
