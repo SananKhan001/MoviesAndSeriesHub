@@ -29,7 +29,6 @@ public class MovieService {
                 .price(movieCreationMessage.getPrice()).build();
 
         movieRepository.save(movie);
-
         cacheRepository.clearMovieCache(movie.getId());
     }
 

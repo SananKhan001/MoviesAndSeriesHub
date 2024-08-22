@@ -80,14 +80,14 @@ public class User implements UserDetails, Serializable {
     }
 
     public UserResponse to(Admin admin){
-        return UserResponse.builder().userId(admin.getId()).name(admin.getName())
+        return UserResponse.builder().userId(this.id).name(admin.getName())
                 .username(this.username).authority(this.authority)
                 .uniqueProfileId(admin.getUniqueProfileId())
                 .profileURL(StreamServiceDetails.STREAM_SERVER_URL + StreamServiceDetails.MEDIA_URI_GET_PROFILE_PATH + admin.getUniqueProfileId()).build();
     }
 
     public UserResponse to(Viewer viewer){
-        return UserResponse.builder().userId(viewer.getId()).name(viewer.getName())
+        return UserResponse.builder().userId(this.id).name(viewer.getName())
                 .username(this.username).authority(this.authority)
                 .profileURL(StreamServiceDetails.STREAM_SERVER_URL + StreamServiceDetails.MEDIA_URI_GET_PROFILE_PATH + viewer.getUniqueProfileId())
                 .uniqueProfileId(viewer.getUniqueProfileId()).build();

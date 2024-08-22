@@ -47,7 +47,7 @@ public class Movie implements Serializable {
     @Column(name = "overall_rating", nullable = true)
     private Double rating;
 
-    @ManyToMany(fetch = FetchType.LAZY)
+    @ManyToMany(fetch = FetchType.EAGER)
     @JsonIgnore
     @JoinTable(
             name = "movie_viewer_mapping",

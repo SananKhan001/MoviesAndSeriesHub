@@ -44,6 +44,7 @@ public class ViewerService {
         Viewer viewer = viewerCreateRequest.to();
         viewer.setUser(user);
         viewer.setUniqueProfileId(Helper.generateUUID());
+        viewer.setTotalPurchasedAmount(0L);
         viewerRepository.save(viewer);
 
         cacheRepository.clearCacheViewerList();

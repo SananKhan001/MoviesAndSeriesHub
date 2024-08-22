@@ -30,6 +30,9 @@ public class Viewer implements Serializable {
     @JsonIgnore
     private User user;
 
+    @Column(name = "total_purchased_amount", nullable = false)
+    private Long totalPurchasedAmount;
+
     // uuid
     @Column(name = "unique_profile_id", nullable = false)
     private String uniqueProfileId;
@@ -45,6 +48,9 @@ public class Viewer implements Serializable {
     @OneToMany(mappedBy = "viewer", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
     @JsonIgnore
     private List<Review> reviewList;
+
+    @OneToMany(mappedBy = "viewer", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
+    private List<Transaction> transactionList;
 
     @CreationTimestamp
     @Column(name = "joined_at")

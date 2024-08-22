@@ -2,6 +2,7 @@ package com.Core_Service.service;
 
 import com.Core_Service.custom_exceptions.NoMovieFoundException;
 import com.Core_Service.custom_exceptions.NoSeriesFoundException;
+import com.Core_Service.custom_exceptions.NoUserFoundException;
 import com.Core_Service.enums.Genre;
 import com.Core_Service.helpers.Helper;
 import com.Core_Service.helpers.StreamServiceDetails;
@@ -13,6 +14,7 @@ import com.Core_Service.model_response.SeriesResponse;
 import com.Core_Service.repository.cache_repository.SeriesCacheRepository;
 import com.Core_Service.repository.db_repository.ReviewRepository;
 import com.Core_Service.repository.db_repository.SeriesRepository;
+import com.Core_Service.repository.db_repository.UserRepository;
 import org.commonDTO.SeriesBuyMessage;
 import org.commonDTO.SeriesCreationMessage;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -43,6 +45,9 @@ public class SeriesService {
 
     @Autowired
     private SeriesCacheRepository cacheRepository;
+    
+    @Autowired
+    private UserRepository userRepository;
 
     public SeriesResponse addSeries(SeriesCreateRequest seriesCreateRequest) {
         Series series = Series.builder().name(seriesCreateRequest.getName())
@@ -153,23 +158,20 @@ public class SeriesService {
     }
 
     // TODO:: Revisit for caching
-    public String assignSeriesToCurrentUser(Long seriesId) throws NoSeriesFoundException {
-        User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        Viewer viewer = user.getViewer();
+    public String assignSeriesToViewer(Viewer viewer, Long seriesId) throws NoSeriesFoundException {
         Series series = seriesRepository.findById(seriesId)
                 .orElseThrow(() -> new NoSeriesFoundException("No series present with provided movie id !!!"));
 
         if(userAlreadyHas(series, viewer)) throw new NoSeriesFoundException("This series is not available for you to buy !!!");
 
-        series.getViewers().add(viewer);
-        seriesRepository.save(series);
+        seriesRepository.updateSeriesViewerMapping(seriesId, viewer.getId());
 
         /**                             ------------------------
          *  SeriesBuyMessage ======>>> | SeriesBuyMessageTopic |
          *                             ------------------------
          */
         streamBridge.send("SeriesBuyMessageTopic", SeriesBuyMessage.builder()
-                        .userId(user.getId())
+                        .userId(viewer.getUser().getId())
                         .seriesId(seriesId)
                         .isNew(true)
                         .build());
@@ -238,5 +240,29 @@ public class SeriesService {
                 .orElseThrow(() -> new NoMovieFoundException("No movie found with given id !!!"));
         return reviewRepository.findByReviewForSeries(series, pageRequest).get()
                 .stream().map(Review::to).collect(Collectors.toList());
+    }
+
+    public List<SeriesResponse> getAllBoughtSeries() {
+        User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        Viewer viewer = user.getViewer();
+        
+        return viewer.getPurchasedSeries()
+                .stream()
+                .map(Series::to)
+                .collect(Collectors.toList());
+    }
+
+
+    public List<SeriesResponse> getAllboughtSeriesByUserId(Long userId) throws NoUserFoundException {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new NoUserFoundException("No User Found By Given id !!!"));
+        Viewer viewer = user.getViewer();
+
+        if(viewer == null) throw new NoUserFoundException("User is not a Viewer !!!");
+
+        return viewer.getPurchasedSeries()
+                .stream()
+                .map(Series::to)
+                .collect(Collectors.toList());
     }
 }

@@ -1,6 +1,11 @@
 package com.payment.service.service;
 
+import com.payment.service.enums.ContentType;
+import com.payment.service.models.MovieUserMapping;
+import com.payment.service.models.SeriesUserMapping;
+import com.payment.service.repository.MovieUserMappingRepository;
 import com.payment.service.repository.PaymentCacheRepository;
+import com.payment.service.repository.SeriesUserMappingRepository;
 import com.payment.service.request.PaymentRequest;
 import com.razorpay.Order;
 import com.razorpay.RazorpayClient;
@@ -13,6 +18,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cache.annotation.CacheConfig;
 import org.springframework.cache.annotation.EnableCaching;
 import org.springframework.cloud.stream.function.StreamBridge;
+import org.springframework.data.domain.Example;
 import org.springframework.stereotype.Service;
 
 import java.util.UUID;
@@ -34,9 +40,26 @@ public class PaymentService {
     @Autowired
     private StreamBridge streamBridge;
 
-    public String createTransaction(@Valid PaymentRequest paymentRequest) {
+    @Autowired
+    private MovieUserMappingRepository movieUserMappingRepository;
 
-        TransactionDetails transactionDetails = cacheRepository.createTransaction(UUID.randomUUID().toString(), paymentRequest);
+    @Autowired
+    private SeriesUserMappingRepository seriesUserMappingRepository;
+
+    public String createTransaction(@Valid PaymentRequest paymentRequest) {
+        Example<MovieUserMapping> movieUserMapping = Example.of(MovieUserMapping.builder()
+                .userId(paymentRequest.getUserId())
+                .movieId(paymentRequest.getContentId()).build());
+        Example<SeriesUserMapping> seriesUserMapping = Example.of(SeriesUserMapping.builder()
+                .seriesId(paymentRequest.getContentId())
+                .userId(paymentRequest.getUserId()).build());
+
+        if((paymentRequest.getContentType().equals(ContentType.MOVIE) && movieUserMappingRepository.exists(movieUserMapping)) ||
+           (paymentRequest.getContentType().equals(ContentType.SERIES) && seriesUserMappingRepository.exists(seriesUserMapping))) {
+            throw new RuntimeException("User have already bought this movie or series !!!");
+        }
+
+       TransactionDetails transactionDetails = cacheRepository.createTransaction(UUID.randomUUID().toString(), paymentRequest);
        RazorpayClient razorpayClient = null; Order order = null;
         try {
             razorpayClient = new RazorpayClient(keyId, keySecret);
@@ -58,6 +81,19 @@ public class PaymentService {
         TransactionDetails transactionDetails = cacheRepository.getTransactionDetailsById(transactionId);
         if(transactionDetails != null) {
             cacheRepository.clearTransactionCache(transactionDetails.getTransactionId());
+
+            if(transactionDetails.getContentType().equals(ContentType.MOVIE.toString())) {
+                MovieUserMapping movieUserMapping = MovieUserMapping.builder()
+                        .userId(transactionDetails.getUserId())
+                        .movieId(transactionDetails.getContentId()).build();
+                movieUserMappingRepository.save(movieUserMapping);
+            } else {
+                SeriesUserMapping seriesUserMapping = SeriesUserMapping.builder()
+                        .userId(transactionDetails.getUserId())
+                        .seriesId(transactionDetails.getContentId()).build();
+                seriesUserMappingRepository.save(seriesUserMapping);
+            }
+
             /**                               --------------------------
              *  TransactionDetails ======>>> | TransactionDetailsTopic |
              *                               --------------------------

@@ -1,6 +1,7 @@
 package com.Core_Service.controller;
 
 import com.Core_Service.custom_exceptions.NoMovieFoundException;
+import com.Core_Service.custom_exceptions.NoUserFoundException;
 import com.Core_Service.enums.Genre;
 import com.Core_Service.model_request.MovieCreateRequest;
 import com.Core_Service.model_request.ReviewCreateRequest;
@@ -71,12 +72,6 @@ public class MovieController {
     }
 
     @PreAuthorize("hasAuthority('VIEWER')")
-    @MutationMapping(name = "buyMovie")
-    public String buyMovie(@Argument Long movieId) throws NoMovieFoundException {
-        return movieService.assignMovieToCurrentUser(movieId);
-    }
-
-    @PreAuthorize("hasAuthority('VIEWER')")
     @MutationMapping(name = "reviewMovie")
     public ReviewResponse reviewMovie(@Argument Long movieId, @Argument ReviewCreateRequest reviewCreateRequest) throws NoMovieFoundException {
         return movieService.reviewMovie(movieId, reviewCreateRequest);
@@ -89,5 +84,17 @@ public class MovieController {
                                                   @Argument Integer size) throws NoMovieFoundException {
         Pageable pageRequest = PageRequest.of(page, size);
         return movieService.getReviewsOfMovie(movieId, pageRequest);
+    }
+
+    @PreAuthorize("hasAuthority('VIEWER')")
+    @QueryMapping(name = "getAllBoughtMovie")
+    public List<MovieResponse> getAllBoughtMovie() {
+        return movieService.getAllBoughtMovie();
+    }
+
+    @PreAuthorize("hasAuthority('ADMIN')")
+    @QueryMapping(name = "getAllBoughtMovieByUserId")
+    public List<MovieResponse> getAllBoughtMovieByUserId(@Argument Long userId) throws NoUserFoundException {
+        return movieService.getAllBoughtMovieByUserId(userId);
     }
 }

@@ -86,6 +86,16 @@ type ReviewResponse {
     rating:Int!
 }
 
+type TransactionResponse {
+    id:ID!,
+    transactionId:String!,
+    contentName:String!,
+    contentType:String!,
+    paidAmount:Int!,
+    viewerName:String!,
+    createdAt:String!
+}
+
 type Mutation{
     # To create an ADMIN-ACCOUNT [Accessible by EVERYONE]
     signUpAdmin(adminCreateRequest:AdminCreateRequest!):UserResponse
@@ -113,12 +123,6 @@ type Mutation{
     updateSeries(seriesCreateRequest:SeriesCreateRequest!, seriesId:ID!):SeriesResponse
     # To DELETE a series [Only accessible by ADMIN]
     deleteSeries(seriesId:ID!):Boolean
-
-    # To BUY a movie [Only accessible by VIEWER] TODO:: [REPAIR THIS DUMMY METHOD]
-    buyMovie(movieId:ID!):String
-
-    # To BUY a series [Only accessible by VIEWER] TODO:: [REPAIR THIS DUMMY METHOD]
-    buySeries(seriesId:ID!):String
 
     # To REVIEW a movie [Only accessible by VIEWER]
     reviewMovie(movieId:ID!, reviewCreateRequest:ReviewCreateRequest!):ReviewResponse
@@ -166,4 +170,19 @@ type Query{
     getReviewsOfMovie(movieId:ID!, page:Int = 0, size:Int = 2):[ReviewResponse]
     # To GET reviews of a series [Accessible by VIEWER and ADMIN]
     getReviewsOfSeries(seriesId:ID!, page:Int = 0, size:Int = 2):[ReviewResponse]
+
+    # To GET transactions of loggedin user [Only accessible by VIEWER]
+    getAllTransactions:[TransactionResponse]
+    # To GET transactions of an user [Only accessible by ADMIN]
+    getAllTransactionsByUserId(userId:ID!):[TransactionResponse]
+
+    # To GET all Series bought by loggedin user [Only accessible by VIEWER]
+    getAllBoughtSeries:[SeriesResponse]
+    # To GET all series bought by user [Only accessible by ADMIN]
+    getAllBoughtSeriesByUserId(userId:ID!):[SeriesResponse]
+
+    # To GET all Movie bought by loggedin user [Only accessible by VIEWER]
+    getAllBoughtMovie:[MovieResponse]
+    # To GET all movie bought by user [Only accessible by ADMIN]
+    getAllBoughtMovieByUserId(userId:ID!):[MovieResponse]
 }

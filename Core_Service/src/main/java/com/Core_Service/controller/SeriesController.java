@@ -2,6 +2,7 @@ package com.Core_Service.controller;
 
 import com.Core_Service.custom_exceptions.NoMovieFoundException;
 import com.Core_Service.custom_exceptions.NoSeriesFoundException;
+import com.Core_Service.custom_exceptions.NoUserFoundException;
 import com.Core_Service.enums.Genre;
 import com.Core_Service.model_request.ReviewCreateRequest;
 import com.Core_Service.model_request.SeriesCreateRequest;
@@ -67,12 +68,6 @@ public class SeriesController {
     }
 
     @PreAuthorize("hasAuthority('VIEWER')")
-    @MutationMapping(name = "buySeries")
-    public String buySeries(@Argument Long seriesId) throws NoSeriesFoundException {
-        return seriesService.assignSeriesToCurrentUser(seriesId);
-    }
-
-    @PreAuthorize("hasAuthority('VIEWER')")
     @MutationMapping(name = "reviewSeries")
     public ReviewResponse reviewSeries(@Argument Long seriesId, @Argument ReviewCreateRequest reviewCreateRequest) throws NoSeriesFoundException {
         return seriesService.reviewSeries(seriesId, reviewCreateRequest);
@@ -85,5 +80,17 @@ public class SeriesController {
                                                   @Argument Integer size) throws NoMovieFoundException {
         Pageable pageRequest = PageRequest.of(page, size);
         return seriesService.getReviewsOfMovie(seriesId, pageRequest);
+    }
+
+    @PreAuthorize("hasAuthority('VIEWER')")
+    @QueryMapping(name = "getAllBoughtSeries")
+    public List<SeriesResponse> getAllBoughtSeries() {
+        return seriesService.getAllBoughtSeries();
+    }
+
+    @PreAuthorize("hasAuthority('ADMIN')")
+    @QueryMapping(name = "getAllBoughtSeriesByUserId")
+    public List<SeriesResponse> getAllBoughtSeriesByUserId(@Argument Long userId) throws NoUserFoundException {
+        return seriesService.getAllboughtSeriesByUserId(userId);
     }
 }

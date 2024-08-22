@@ -1,12 +1,10 @@
 package com.Core_Service.service;
 
 import com.Core_Service.custom_exceptions.NoMovieFoundException;
+import com.Core_Service.custom_exceptions.NoUserFoundException;
 import com.Core_Service.helpers.Helper;
 import com.Core_Service.helpers.StreamServiceDetails;
-import com.Core_Service.model.Movie;
-import com.Core_Service.model.Review;
-import com.Core_Service.model.User;
-import com.Core_Service.model.Viewer;
+import com.Core_Service.model.*;
 import com.Core_Service.model_request.MovieCreateRequest;
 import com.Core_Service.model_request.ReviewCreateRequest;
 import com.Core_Service.model_response.MovieResponse;
@@ -15,6 +13,7 @@ import com.Core_Service.repository.cache_repository.MovieCacheRepository;
 import com.Core_Service.repository.db_repository.MovieRepository;
 import com.Core_Service.repository.cache_repository.EpisodeCacheRepository;
 import com.Core_Service.repository.db_repository.ReviewRepository;
+import com.Core_Service.repository.db_repository.UserRepository;
 import org.commonDTO.MovieBuyMessage;
 import org.commonDTO.MovieCreationMessage;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -45,6 +44,9 @@ public class MovieService {
 
     @Autowired
     private MovieCacheRepository cacheRepository;
+
+    @Autowired
+    private UserRepository userRepository;
 
     public MovieResponse addMovie(MovieCreateRequest movieCreateRequest){
         Movie movie = Movie.builder().name(movieCreateRequest.getName())
@@ -153,23 +155,20 @@ public class MovieService {
     }
 
     // TODO:: Revisit for caching
-    public String assignMovieToCurrentUser(Long movieId) throws NoMovieFoundException {
-        User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        Viewer viewer = user.getViewer();
+    public String assignMovieToViewer(Viewer viewer, Long movieId) throws NoMovieFoundException {
         Movie movie = movieRepository.findById(movieId)
                 .orElseThrow(() -> new NoMovieFoundException("No movie present with provided movie id !!!"));
 
         if(userAlreadyHas(movie, viewer)) throw new NoMovieFoundException("This movie is not available for you to buy !!!");
 
-        movie.getViewers().add(viewer);
-        movie = movieRepository.save(movie);
+        movieRepository.updateMovieViewerMapping(movieId, viewer.getId());
 
         /**                            -----------------------
          *  MovieBuyMessage ======>>> | MovieBuyMessageTopic |
          *                            -----------------------
          */
         streamBridge.send("MovieBuyMessageTopic", MovieBuyMessage.builder()
-                .userId(user.getId())
+                .userId(viewer.getUser().getId())
                 .movieId(movieId)
                 .isNew(true)
                 .build());
@@ -240,5 +239,28 @@ public class MovieService {
                 .orElseThrow(() -> new NoMovieFoundException("No movie found with given id !!!"));
         return reviewRepository.findByReviewForMovie(movie, pageRequest).get()
                 .stream().map(review -> review.to()).collect(Collectors.toList());
+    }
+
+    public List<MovieResponse> getAllBoughtMovie() {
+        User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        Viewer viewer = user.getViewer();
+
+        return viewer.getPurchasedMovies()
+                .stream()
+                .map(Movie::to)
+                .collect(Collectors.toList());
+    }
+
+    public List<MovieResponse> getAllBoughtMovieByUserId(Long userId) throws NoUserFoundException {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new NoUserFoundException("No User Found By Given id !!!"));
+        Viewer viewer = user.getViewer();
+
+        if(viewer == null) throw new NoUserFoundException("User is not a Viewer !!!");
+
+        return viewer.getPurchasedMovies()
+                .stream()
+                .map(Movie::to)
+                .collect(Collectors.toList());
     }
 }
