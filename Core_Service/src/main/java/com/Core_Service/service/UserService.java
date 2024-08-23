@@ -81,14 +81,12 @@ public class UserService implements UserDetailsManager {
 
     @Override
     public boolean userExists(String username) {
-        // TODO:: user should first load from cache
         return userRepository.findByUsername(username).isPresent();
     }
 
     @Cacheable(key = "'USER::' + #username")
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        // TODO:: user should first load from cache
         return userRepository.findByUsername(username)
                 .orElseThrow(() -> new UsernameNotFoundException("There are no user with provided username"));
     }
