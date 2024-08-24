@@ -2,6 +2,7 @@ package NotificationService.config_springsecurity;
 
 import NotificationService.config_jwt.JwtAuthenticationEntryPoint;
 import NotificationService.config_jwt.JwtAuthenticationFilter;
+import NotificationService.enums.Authorities;
 import NotificationService.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
@@ -15,6 +16,9 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.web.cors.CorsConfiguration;
+
+import java.util.Arrays;
 
 @Configuration
 public class SecurityConfig {
@@ -30,9 +34,17 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http.csrf().disable()
-                .cors().disable()
+                .cors(cors -> cors.configurationSource(request -> {
+                    CorsConfiguration configuration = new CorsConfiguration();
+                    configuration.setAllowedOrigins(Arrays.asList("http://127.0.0.1:5500")); // Specify allowed origins
+                    configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS")); // Allow all methods
+                    configuration.setAllowedHeaders(Arrays.asList("Authorization", "Content-Type")); // Allow all headers
+                    configuration.setAllowCredentials(true); // Allow credentials
+                    return configuration;}))
                 .authorizeHttpRequests()
-                .anyRequest().authenticated()
+                .requestMatchers("/ws/**").permitAll()
+//                .requestMatchers("/message/sendToAll").hasAuthority(Authorities.ADMIN.toString())
+                .anyRequest().permitAll()
                 .and()
                 .exceptionHandling(ex -> ex.authenticationEntryPoint(point))
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))

@@ -1,29 +1,26 @@
-package NotificationService.config_jwt;
+package NotificationService.config_websocket;
 
+import NotificationService.config_jwt.JwtHelper;
+import com.sun.security.auth.UserPrincipal;
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.MalformedJwtException;
-import jakarta.servlet.FilterChain;
-import jakarta.servlet.ServletException;
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
-import lombok.NoArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.server.ServerHttpRequest;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
-import org.springframework.web.filter.OncePerRequestFilter;
+import org.springframework.web.socket.WebSocketHandler;
+import org.springframework.web.socket.server.support.DefaultHandshakeHandler;
 
-import java.io.IOException;
+import java.security.Principal;
+import java.util.Map;
 
-@Slf4j
 @Configuration
-@NoArgsConstructor
-public class JwtAuthenticationFilter extends OncePerRequestFilter {
+public class UserHandshakeHandler extends DefaultHandshakeHandler {
 
     @Value("${jwt.header.key}")
     private String headerKey;
@@ -38,11 +35,12 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     private UserDetailsService userDetailsService;
 
     @Override
-    protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
-        String requestHeader = request.getHeader(headerKey);
+    protected Principal determineUser(ServerHttpRequest request, WebSocketHandler wsHandler, Map<String, Object> attributes) {
+
+        String requestHeader = request.getHeaders().getFirst(headerKey);
         String username = null;
         String token = null;
-
+        System.out.println("From AuthFilter: " + requestHeader);
         if (requestHeader != null && requestHeader.startsWith(tokenStartsWith)) {
             token = requestHeader.substring(7);
             try {
@@ -66,12 +64,13 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             if (validateToken) {
                 //set the authentication
                 UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
-                authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
                 SecurityContextHolder.getContext().setAuthentication(authentication);
+                attributes.put("username", userDetails.getUsername());
+                return new UserPrincipal(userDetails.getUsername());
             } else {
                 logger.info("Validation fails !!");
             }
         }
-        filterChain.doFilter(request, response);
+        return null;
     }
 }

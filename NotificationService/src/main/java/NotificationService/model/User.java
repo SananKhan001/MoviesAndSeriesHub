@@ -1,5 +1,6 @@
 package NotificationService.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
 import org.springframework.security.core.GrantedAuthority;
@@ -35,6 +36,15 @@ public class User implements UserDetails, Serializable {
 
     @Column(name = "authority", nullable = false)
     private String authority;
+
+    @ManyToMany(fetch = FetchType.EAGER)
+    @JsonIgnore
+    @JoinTable(
+            name = "personal_notification_mapping",
+            joinColumns = @JoinColumn(name = "notification_id", referencedColumnName = "id"),
+            inverseJoinColumns = @JoinColumn(name = "user_id", referencedColumnName = "id")
+    )
+    private List<PersonalNotification> personalNotifications;
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {

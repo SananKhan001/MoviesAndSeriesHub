@@ -18,7 +18,6 @@ public class AuthenticationService {
     public JWTResponse generateToken(JWTRequest credentials) {
         UserDetails userDetails = userDetailsService.loadUserByUsername(credentials.getUsername());
         String token = this.helper.generateToken(userDetails);
-
         return JWTResponse.builder().jwtToken(token).build();
     }
 }

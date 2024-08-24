@@ -13,6 +13,10 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.web.cors.CorsConfiguration;
+
+import java.util.Arrays;
+import java.util.Collections;
 
 
 @EnableMethodSecurity(securedEnabled = true)
@@ -29,8 +33,15 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http.csrf().disable()
+                .cors(cors -> cors.configurationSource(request -> {
+                    CorsConfiguration configuration = new CorsConfiguration();
+                    configuration.setAllowedOriginPatterns(Arrays.asList("*")); // Allows all origins with patterns
+                    configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS")); // Allow all methods
+                    configuration.setAllowedHeaders(Arrays.asList("Authorization", "Content-Type")); // Allow all headers
+                    configuration.setAllowCredentials(true); // Allow credentials
+                    return configuration;}))
                 .authorizeHttpRequests()
-                .requestMatchers("/graphiql/**", "/core/**")
+                .requestMatchers("/graphiql/**", "/core/**", "/login")
                 .permitAll()
                 .and()
                 .exceptionHandling(ex -> ex.authenticationEntryPoint(point))
