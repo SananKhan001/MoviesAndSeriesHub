@@ -4,6 +4,7 @@ import NotificationService.config_jwt.JwtHelper;
 import com.sun.security.auth.UserPrincipal;
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.MalformedJwtException;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Configuration;
@@ -19,6 +20,7 @@ import org.springframework.web.socket.server.support.DefaultHandshakeHandler;
 import java.security.Principal;
 import java.util.Map;
 
+@Slf4j
 @Configuration
 public class UserHandshakeHandler extends DefaultHandshakeHandler {
 
@@ -38,6 +40,7 @@ public class UserHandshakeHandler extends DefaultHandshakeHandler {
     protected Principal determineUser(ServerHttpRequest request, WebSocketHandler wsHandler, Map<String, Object> attributes) {
 
         String requestHeader = request.getHeaders().getFirst(headerKey);
+        log.info("Header: {}", requestHeader);
         String username = null;
         String token = null;
         System.out.println("From AuthFilter: " + requestHeader);
@@ -66,11 +69,11 @@ public class UserHandshakeHandler extends DefaultHandshakeHandler {
                 UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
                 SecurityContextHolder.getContext().setAuthentication(authentication);
                 attributes.put("username", userDetails.getUsername());
+                logger.info("Validation Successful !!!");
                 return new UserPrincipal(userDetails.getUsername());
-            } else {
-                logger.info("Validation fails !!");
             }
         }
-        return null;
+        logger.info("Validation Fails !!");
+        throw new RuntimeException("UnAuthenticated User !!!");
     }
 }

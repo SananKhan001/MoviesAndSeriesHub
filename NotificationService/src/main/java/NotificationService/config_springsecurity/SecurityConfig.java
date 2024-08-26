@@ -42,7 +42,7 @@ public class SecurityConfig {
                     configuration.setAllowCredentials(true); // Allow credentials
                     return configuration;}))
                 .authorizeHttpRequests()
-                .requestMatchers("/ws/**").permitAll()
+//                .requestMatchers("/ws/**").permitAll()
 //                .requestMatchers("/message/sendToAll").hasAuthority(Authorities.ADMIN.toString())
                 .anyRequest().permitAll()
                 .and()

@@ -125,7 +125,6 @@
                 password: $("#password").val(),
             })
         }).then(resp => resp.json()).then(data => {
-            console.log(data);
             localStorage.setItem("token", data.jwtToken);
             $("#login-div").hide();
             $("#connect-div").removeClass("d-none")
@@ -136,7 +135,6 @@
 
     let stompClient = null;
     $("#connect").click(() => {
-        console.log(getItem("token"));
         const socket = new SockJS("http://localhost:8085/ws");
         stompClient = Stomp.over(socket);
         stompClient.connect({Authorization: `Bearer ${getItem("token")}`}, (frame) => {
@@ -146,7 +144,8 @@
             stompClient.subscribe("/topic/messages", (message) => {
                 const data = JSON.parse(message.body);
                 console.log(data);
-
+                var audio = new Audio('level-up-191997.mp3');
+                audio.play();
                 $("#tbody").append(`<tr><td>${data.content}</td><td>${data.date}</td></tr>`)
 
             });

@@ -1,7 +1,6 @@
 package NotificationService.controller;
 
-import NotificationService.config_websocket.WSservice;
-import NotificationService.model.GlobalNotification;
+import NotificationService.service.WSservice;
 import NotificationService.request.GlobalMessageRequest;
 import NotificationService.response.ResponseMessage;
 import org.springframework.beans.factory.annotation.Autowired;

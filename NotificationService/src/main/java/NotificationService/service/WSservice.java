@@ -1,4 +1,4 @@
-package NotificationService.config_websocket;
+package NotificationService.service;
 
 import NotificationService.model.GlobalNotification;
 import NotificationService.model.PersonalNotification;

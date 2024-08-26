@@ -129,6 +129,9 @@ type Mutation{
 
     # To REVIEW a series [Only accessible by VIEWER]
     reviewSeries(seriesId:ID!, reviewCreateRequest:ReviewCreateRequest!):ReviewResponse
+
+    # To Send Notification To All Users [Only accessible by ADMIN]
+    notifyAllUsers(message:String!):Boolean
 }
 
 type Query{
