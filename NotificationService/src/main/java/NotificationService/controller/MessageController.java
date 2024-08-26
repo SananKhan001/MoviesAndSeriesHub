@@ -1,8 +1,8 @@
 package NotificationService.controller;
 
 import NotificationService.service.WSservice;
-import NotificationService.request.GlobalMessageRequest;
 import NotificationService.response.ResponseMessage;
+import org.commonDTO.NotificationMessage;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.handler.annotation.SendTo;
@@ -21,8 +21,8 @@ public class MessageController {
     }
 
     @PostMapping("/sendToAll")
-    public void sendToAll(@RequestBody GlobalMessageRequest message){
-        wSservice.sendMessage(message.getContent());
+    public void sendToAll(@RequestBody NotificationMessage message){
+        wSservice.sendUser(message);
     }
 
 }

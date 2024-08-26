@@ -1,4 +1,4 @@
-package NotificationService.request;
+package com.Core_Service.model_request;
 
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;

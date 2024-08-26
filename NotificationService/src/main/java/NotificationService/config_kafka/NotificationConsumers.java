@@ -14,9 +14,9 @@ public class NotificationConsumers {
     @Autowired
     private WSservice wSservice;
 
-    @Bean
-    public Consumer<String> globalNotificationConsumer() {
-        return notification -> wSservice.sendMessage(notification);
-    }
+//    @Bean
+//    public Consumer<String> globalNotificationConsumer() {
+//        return notification -> wSservice.sendMessage(notification);
+//    }
 
 }

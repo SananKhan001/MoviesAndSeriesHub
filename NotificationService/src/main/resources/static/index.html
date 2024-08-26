@@ -141,7 +141,7 @@
             console.log(frame);
             setConnected()
 
-            stompClient.subscribe("/topic/messages", (message) => {
+            stompClient.subscribe("/user/topic/messages", (message) => {
                 const data = JSON.parse(message.body);
                 console.log(data);
                 var audio = new Audio('level-up-191997.mp3');

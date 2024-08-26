@@ -1,5 +1,6 @@
 org/commonDTO/TransactionDetails$TransactionDetailsBuilder.class
 org/commonDTO/EpisodeCreationMessage.class
+org/commonDTO/NotificationMessage$NotificationMessageBuilder.class
 org/commonDTO/SeriesBuyMessage.class
 org/commonDTO/MovieBuyMessage$MovieBuyMessageBuilder.class
 org/commonDTO/SeriesBuyMessage$SeriesBuyMessageBuilder.class
@@ -11,4 +12,5 @@ org/commonDTO/EpisodeCreationMessage$EpisodeCreationMessageBuilder.class
 org/commonDTO/SeriesCreationMessage.class
 org/commonDTO/MovieCreationMessage$MovieCreationMessageBuilder.class
 org/commonDTO/UserCreationMessage.class
+org/commonDTO/NotificationMessage.class
 org/commonDTO/MovieBuyMessage.class

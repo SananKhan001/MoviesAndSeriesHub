@@ -19,6 +19,7 @@ import org.springframework.messaging.simp.stomp.StompCommand;
 import org.springframework.messaging.simp.stomp.StompHeaderAccessor;
 import org.springframework.messaging.support.ChannelInterceptor;
 import org.springframework.messaging.support.MessageHeaderAccessor;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -62,6 +63,7 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
 //                .setHandshakeHandler(userHandshakeHandler)
                 .setAllowedOriginPatterns("*")
                 .withSockJS();
+        registry.addEndpoint("/ws");
     }
 
     @Override
@@ -84,6 +86,7 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
                         token = authorizationHeader.substring(7);
                         try {
                             username = jwtHelper.getUsernameFromToken(token);
+                            log.info("Username: {}", username);
                         } catch (Exception e) {
                             log.info("WebSocketConfig: Invalid Header Value !! :89");
                             throw new RuntimeException(e);
