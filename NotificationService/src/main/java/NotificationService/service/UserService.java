@@ -1,7 +1,7 @@
 package NotificationService.service;
 
 import NotificationService.model.User;
-import NotificationService.repository.UserRepository;
+import NotificationService.repository.db_repo.UserRepository;
 import org.commonDTO.UserCreationMessage;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UserDetails;

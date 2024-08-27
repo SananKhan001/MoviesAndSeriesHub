@@ -25,7 +25,7 @@ public class PersonalNotification {
     @Column(name = "message_content", nullable = false)
     private String content;
 
-    @ManyToMany(mappedBy = "personalNotifications", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+    @ManyToMany(mappedBy = "personalNotifications", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     @JsonIgnore
     private List<User> userList;
 

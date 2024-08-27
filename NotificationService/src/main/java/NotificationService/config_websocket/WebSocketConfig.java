@@ -48,9 +48,6 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
     @Autowired
     private UserDetailsService userDetailsService;
 
-    @Autowired
-    private UserHandshakeHandler userHandshakeHandler;
-
     @Override
     public void configureMessageBroker(MessageBrokerRegistry registry) {
         registry.enableSimpleBroker("/topic");
@@ -60,7 +57,6 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
     @Override
     public void registerStompEndpoints(StompEndpointRegistry registry) {
         registry.addEndpoint("/ws")
-//                .setHandshakeHandler(userHandshakeHandler)
                 .setAllowedOriginPatterns("*")
                 .withSockJS();
         registry.addEndpoint("/ws");
@@ -86,7 +82,6 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
                         token = authorizationHeader.substring(7);
                         try {
                             username = jwtHelper.getUsernameFromToken(token);
-                            log.info("Username: {}", username);
                         } catch (Exception e) {
                             log.info("WebSocketConfig: Invalid Header Value !! :89");
                             throw new RuntimeException(e);

@@ -34,6 +34,11 @@ input ReviewCreateRequest{
     rating:Int!
 }
 
+input PrivateMessageRequest{
+    content:String!,
+    userIdList:[ID!]!
+}
+
 type JWTResponse{
     jwtToken:String!
 }
@@ -132,6 +137,8 @@ type Mutation{
 
     # To Send Notification To All Users [Only accessible by ADMIN]
     notifyAllUsers(message:String!):Boolean
+    # To Send Notification To Listed Users [Only accessible by ADMIN]
+    notifyUsers(message:PrivateMessageRequest!):Boolean
 }
 
 type Query{

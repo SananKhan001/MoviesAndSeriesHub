@@ -5,10 +5,10 @@ import lombok.*;
 import java.util.List;
 
 @Data
-@AllArgsConstructor
-@NoArgsConstructor
 @Builder
 @ToString
+@AllArgsConstructor
+@NoArgsConstructor
 public class NotificationMessage {
     private String content;
     private List<Long> userIdList;

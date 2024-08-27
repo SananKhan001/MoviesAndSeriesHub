@@ -1,4 +1,4 @@
-package NotificationService.repository;
+package NotificationService.repository.db_repo;
 
 import NotificationService.model.GlobalNotification;
 import org.springframework.data.jpa.repository.JpaRepository;

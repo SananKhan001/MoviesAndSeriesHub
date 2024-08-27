@@ -2,10 +2,7 @@ package com.Core_Service.model_request;
 
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import java.util.List;
 
@@ -13,6 +10,7 @@ import java.util.List;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
+@ToString
 public class PrivateMessageRequest {
     @NotNull(message = "Content should not be null !!!")
     @NotEmpty(message = "Content should not be empty !!!")
