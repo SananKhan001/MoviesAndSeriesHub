@@ -98,4 +98,15 @@ public class WSservice {
 
         sendNewNotificationCount(new NewNotification(0, username));
     }
+
+    public void getActiveUserCount(Principal principal) {
+        String username = principal.getName();
+        simpMessagingTemplate.convertAndSendToUser(username, "/topic/active", activeUserRepository.getActiveUsersSet().size());
+    }
+
+    public void getUnseenNotificationCount(Principal principal) {
+        String username = principal.getName();
+        sendNewNotificationCount(new NewNotification(activeUserRepository
+                .getUserNotificationCount(username), username));
+    }
 }

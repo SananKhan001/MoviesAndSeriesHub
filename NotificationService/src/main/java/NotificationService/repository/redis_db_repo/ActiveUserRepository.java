@@ -18,26 +18,6 @@ import java.util.Set;
 @CacheConfig(cacheManager = "NotificationCacheManager", cacheNames = "currently_active_cache")
 public class ActiveUserRepository {
 
-    @CachePut(key = "'ACTIVE::USERS::COUNT'")
-    public Long updateActiveUserCount(Long activeUsers) {
-        return activeUsers;
-    }
-
-    @Cacheable(key = "'ACTIVE::USERS::COUNT'")
-    public Long getActiveUsersCount() {
-        return 0L;
-    }
-
-    @Cacheable(key = "'ISFIRSTUSER'")
-    public Boolean isFirstUser() {
-        return true;
-    }
-
-    @CachePut(key = "'ISFIRSTUSER'")
-    public Boolean isFirstUser(Boolean isFirst) {
-        return isFirst;
-    }
-
     @CachePut(key = "'ACTIVE::USERS::SET'")
     public Set<Long> updateActiveUsersSet(Set<Long> userIds) {
         return userIds;
@@ -66,5 +46,13 @@ public class ActiveUserRepository {
     @Cacheable(key = "'USER::UNSEEN::' + #username")
     public List<ResponseMessage> getUnseenNotifications(String username) {
         return new ArrayList<>();
+    }
+
+    @CacheEvict(allEntries = true)
+    public void clearCache(){}
+
+    @PostConstruct
+    public void init() {
+        clearCache();
     }
 }

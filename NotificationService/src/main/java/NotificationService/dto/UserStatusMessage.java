@@ -12,5 +12,6 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class UserStatusMessage {
     private Long userId;
+    private String username;
     private Status status;
 }

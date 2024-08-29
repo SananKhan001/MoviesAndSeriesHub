@@ -32,4 +32,17 @@ public class MessageController {
         wSservice.showUnseenNotifications(principal);
         return ResponseEntity.ok().build();
     }
+
+    @MessageMapping("/active/user/count")
+    public ResponseEntity getActiveUserCount(Principal principal) {
+        wSservice.getActiveUserCount(principal);
+        return ResponseEntity.ok().build();
+    }
+
+    @MessageMapping("/unseen/notification/count")
+    public ResponseEntity unseenNotificationCount(Principal principal) {
+        wSservice.getUnseenNotificationCount(principal);
+        return ResponseEntity.ok().build();
+    }
+
 }

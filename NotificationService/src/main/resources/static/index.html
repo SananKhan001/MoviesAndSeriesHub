@@ -234,6 +234,15 @@
                 console.log(activeUserCount);
                 $("#active-users-count").text(activeUserCount);
             });
+
+            stompClient.subscribe("/user/topic/active", (message) => {
+                const activeUserCount = JSON.parse(message.body);
+                console.log(activeUserCount);
+                $("#active-users-count").text(activeUserCount);
+            });
+
+            stompClient.send("/app/active/user/count", {});
+            stompClient.send("/app/unseen/notification/count", {});
         });
     });
 

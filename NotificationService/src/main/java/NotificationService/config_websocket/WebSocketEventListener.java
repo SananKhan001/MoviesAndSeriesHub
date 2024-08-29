@@ -45,40 +45,22 @@ public class WebSocketEventListener {
     @Autowired
     private ActiveUserRepository activeUserRepository;
 
-    private void decrementActiveUserCount() {
-        streamBridge.send("UpdateActiveUserCountTopic", -1);
-    }
-
-    private void incrementActiveUserCount() {
-        streamBridge.send("UpdateActiveUserCountTopic", 1);
-    }
-
     private void updateUserStatus(String username, Status status) {
         User user = (User) userService.loadUserByUsername(username);
         UserStatusMessage userStatusMessage = UserStatusMessage.builder()
-                .userId(user.getId()).status(status).build();
+                .userId(user.getId()).status(status).username(username).build();
 
         streamBridge.send("UserStatusMessageTopic", userStatusMessage);
     }
 
-    private void showNewNotificationCount(String username) {
-        NewNotification newNotification = NewNotification.builder()
-                .username(username)
-                .newNotificationCount(activeUserRepository.getUserNotificationCount(username)).build();
-        streamBridge.send("NewNotificationTopic", newNotification);
-    }
-
     @EventListener
     public void handleWebSocketDisconnectListener(SessionDisconnectEvent event){
-        decrementActiveUserCount();
         updateUserStatus(event.getUser().getName(), Status.INACTIVE);
     }
 
     @EventListener
     public void handleWebSocketConnectListener(SessionConnectEvent event){
-        incrementActiveUserCount();
         updateUserStatus(event.getUser().getName(), Status.ACTIVE);
-        showNewNotificationCount(event.getUser().getName());
     }
 
 }
