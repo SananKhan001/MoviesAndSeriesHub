@@ -1,28 +1,35 @@
 package NotificationService.controller;
 
+import NotificationService.repository.redis_db_repo.ActiveUserRepository;
 import NotificationService.service.WSservice;
-import NotificationService.response.ResponseMessage;
-import org.commonDTO.NotificationMessage;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.messaging.handler.annotation.MessageMapping;
-import org.springframework.messaging.handler.annotation.SendTo;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+import java.security.Principal;
+import java.util.Set;
 
 @RestController
+@RequestMapping
 public class MessageController {
+
+    @Autowired
+    private ActiveUserRepository activeUserRepository;
 
     @Autowired
     private WSservice wSservice;
 
-    @MessageMapping("/message")
-    @SendTo("/topic/messages")
-    public ResponseMessage getMessage(@RequestBody ResponseMessage responseMessage){
-        return responseMessage;
+    @GetMapping
+    public Set<Long> getActiveUserSet(){
+        return activeUserRepository.getActiveUsersSet();
     }
 
-    @PostMapping("/sendToAll")
-    public void sendToAll(@RequestBody NotificationMessage message){
-        wSservice.sendUser(message);
+    @MessageMapping("/unseen/notifications")
+    public ResponseEntity unseenNotifications(Principal principal) {
+        wSservice.showUnseenNotifications(principal);
+        return ResponseEntity.ok().build();
     }
-
 }

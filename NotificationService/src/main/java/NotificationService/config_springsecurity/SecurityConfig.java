@@ -42,8 +42,8 @@ public class SecurityConfig {
                     configuration.setAllowCredentials(true); // Allow credentials
                     return configuration;}))
                 .authorizeHttpRequests()
-//                .requestMatchers("/ws/**").permitAll()
-//                .requestMatchers("/message/sendToAll").hasAuthority(Authorities.ADMIN.toString())
+                .requestMatchers("/unseen/notifications").hasAuthority(Authorities.VIEWER.toString())
+                .requestMatchers("/ws/**").permitAll()
                 .anyRequest().permitAll()
                 .and()
                 .exceptionHandling(ex -> ex.authenticationEntryPoint(point))

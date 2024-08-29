@@ -35,17 +35,56 @@
             position: fixed;
             top: 10px;
             right: 10px;
-            width: 50px;
-            height: 50px;
+            width: 100px; /* Increase width to fit both texts */
+            height: auto; /* Adjust height based on content */
             border-radius: 50%;
             background-color: #007bff; /* Adjust color as needed */
             color: white;
             display: flex;
+            flex-direction: column; /* Stack label and count vertically */
             align-items: center;
             justify-content: center;
-            font-size: 1rem;
+            padding: 10px;
+            box-sizing: border-box; /* Ensure padding is included in total width/height */
             z-index: 1000; /* Ensure it's on top */
         }
+
+        #active-users-label {
+            font-size: 0.8rem; /* Adjust font size as needed */
+            margin-bottom: 5px; /* Space between label and count */
+        }
+
+        #active-users-count {
+            font-size: 1.2rem; /* Slightly larger for emphasis */
+        }
+
+        #notification-block {
+            position: fixed;
+            top: 10px;
+            left: 10px;
+            width: 100px; /* Increase width to fit both texts */
+            height: auto; /* Adjust height based on content */
+            border-radius: 50%;
+            background-color: #007bff; /* Adjust color as needed */
+            color: white;
+            display: flex;
+            flex-direction: column; /* Stack label and count vertically */
+            align-items: center;
+            justify-content: center;
+            padding: 10px;
+            box-sizing: border-box; /* Ensure padding is included in total width/height */
+            z-index: 1000; /* Ensure it's on top */
+        }
+
+        #notification-label {
+            font-size: 0.8rem; /* Adjust font size as needed */
+            margin-bottom: 5px; /* Space between label and count */
+        }
+
+        #notification-count {
+            font-size: 1.2rem; /* Slightly larger for emphasis */
+        }
+
     </style>
 </head>
 
@@ -80,16 +119,8 @@
             <h4>Send Message</h4>
         </div>
         <form id="send-form" class="col-12 d-flex align-items-end gap-3">
-            <div class="w-100">
-                <label class="form-label">Username</label>
-                <input type="text" class="form-control" name="login-username" id="username" required/>
-            </div>
-            <div class="w-100">
-                <label class="form-label">Message</label>
-                <input type="text" class="form-control" name="message" id="message" required/>
-            </div>
             <div class="d-grid">
-                <button type="submit" class="btn btn-warning" id="send" disabled>SEND</button>
+                <button type="submit" class="btn btn-warning" id="send" disabled>SHOW UNSEEN NOTIFICATIONS</button>
             </div>
         </form>
     </div>
@@ -117,8 +148,15 @@
         </div>
     </div>
 </div>
-<!-- Circular block for active user count -->
-<div id="active-users-block">0</div>
+<div id="active-users-block">
+    <div id="active-users-label">Active Users</div>
+    <div id="active-users-count">0</div>
+</div>
+<div id="notification-block">
+    <div id="notification-label">Notifications</div>
+    <div id="notification-count">0</div>
+</div>
+
 
 
 <script>
@@ -169,6 +207,19 @@
 
             });
 
+            stompClient.subscribe("/user/topic/notification/count", (message) => {
+                const notificationCount= JSON.parse(message.body);
+                console.log(notificationCount);
+                $("#notification-count").text(notificationCount);
+            });
+
+            stompClient.subscribe("/user/topic/unseen/messages", (message) => {
+                const data = JSON.parse(message.body);
+                const activeUserCount = JSON.parse(message.body);
+                console.log(activeUserCount);
+                $("#tbody").append(`<tr><td>${data.content}</td><td>${data.date}</td></tr>`)
+            });
+
             stompClient.subscribe("/topic/messages", (message) => {
                 const data = JSON.parse(message.body);
                 console.log(data);
@@ -181,21 +232,15 @@
             stompClient.subscribe("/topic/active", (message) => {
                 const activeUserCount = JSON.parse(message.body);
                 console.log(activeUserCount);
-                $("#active-users-block").text(activeUserCount);
+                $("#active-users-count").text(activeUserCount);
             });
-
-
         });
     });
 
-    // $("#send-form").submit((e) => {
-    //     e.preventDefault();
-    //     stompClient.send("/app/chat", {}, JSON.stringify({
-    //         to: $("#username").val(),
-    //         message: $("#message").val(),
-    //         from: getItem("username")
-    //     }));
-    // });
+    $("#send-form").submit((e) => {
+        e.preventDefault();
+        stompClient.send("/app/unseen/notifications", {});
+    });
 </script>
 </body>
 </html>

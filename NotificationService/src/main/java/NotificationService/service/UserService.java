@@ -4,6 +4,9 @@ import NotificationService.model.User;
 import NotificationService.repository.db_repo.UserRepository;
 import org.commonDTO.UserCreationMessage;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.CacheConfig;
+import org.springframework.cache.annotation.Cacheable;
+import org.springframework.cache.annotation.EnableCaching;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -11,6 +14,8 @@ import org.springframework.security.provisioning.UserDetailsManager;
 import org.springframework.stereotype.Service;
 
 @Service
+@EnableCaching
+@CacheConfig(cacheNames = "USER_DETAILS", cacheManager = "NotificationCacheManager")
 public class UserService implements UserDetailsManager {
     
     @Autowired
@@ -55,7 +60,9 @@ public class UserService implements UserDetailsManager {
     }
 
     @Override
+    @Cacheable(key = "'user::' + #username")
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
         return userRepository.findByUsername(username).get();
     }
+
 }

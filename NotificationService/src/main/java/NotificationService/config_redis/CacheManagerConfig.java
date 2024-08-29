@@ -16,10 +16,16 @@ public class CacheManagerConfig {
     @Value("${redis.ttl.default}")
     private String defaultTTL;
 
+    @Value("${redis.ttl.user_details}")
+    private String userDetailsTTL;
+
     @Bean(name = "NotificationCacheManager")
     public CacheManager cacheManager(RedisConnectionFactory connectionFactory) {
         return RedisCacheManager.RedisCacheManagerBuilder
                 .fromConnectionFactory(connectionFactory)
+                .withCacheConfiguration("USER_DETAILS",
+                        RedisCacheConfiguration.defaultCacheConfig()
+                                .entryTtl(Duration.ofMinutes(Long.parseLong(userDetailsTTL))))
                 .cacheDefaults(RedisCacheConfiguration.defaultCacheConfig()
                         .entryTtl(Duration.ofMinutes(Long.parseLong(defaultTTL))))
                 .build();
