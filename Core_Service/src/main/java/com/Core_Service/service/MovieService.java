@@ -6,6 +6,7 @@ import com.Core_Service.helpers.Helper;
 import com.Core_Service.helpers.StreamServiceDetails;
 import com.Core_Service.model.*;
 import com.Core_Service.model_request.MovieCreateRequest;
+import com.Core_Service.model_request.PrivateMessageRequest;
 import com.Core_Service.model_request.ReviewCreateRequest;
 import com.Core_Service.model_response.MovieResponse;
 import com.Core_Service.model_response.ReviewResponse;
@@ -25,6 +26,8 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -47,6 +50,9 @@ public class MovieService {
 
     @Autowired
     private UserRepository userRepository;
+
+    @Autowired
+    private NotificationService notificationService;
 
     public MovieResponse addMovie(MovieCreateRequest movieCreateRequest){
         Movie movie = Movie.builder().name(movieCreateRequest.getName())
@@ -75,6 +81,8 @@ public class MovieService {
                 .rating(movie.getRating() == null ? -1 : movie.getRating())
                 .createdAt(movie.getCreatedAt())
                 .build());
+
+        notificationService.notifyAllUsers("New movie has been added, pay and watch " + movie.getName() + " !!!");
 
         return movie.to();
     }
@@ -172,6 +180,11 @@ public class MovieService {
                 .movieId(movieId)
                 .isNew(true)
                 .build());
+
+        notificationService.notifyUsers(PrivateMessageRequest.builder()
+                .userIdList(Collections.singletonList(viewer.getUser().getId()))
+                .content("You have bought movie: " + movie.getName()
+                        + ". \nThanks for the purchase " + viewer.getName()).build());
 
         return "Bought movie successfully !!!";
     }

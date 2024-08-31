@@ -30,7 +30,7 @@ public class EpisodeController {
                                                  String episodeName,
                                                  @Argument
                                                  @NotNull(message = "MovieId should not be null !!!")
-                                                 Long movieId) {
+                                                 Long movieId) throws NoMovieFoundException {
         return episodeService.createEpisodeForMovie(episodeName, movieId);
     }
 

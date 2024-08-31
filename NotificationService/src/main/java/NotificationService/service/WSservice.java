@@ -11,6 +11,7 @@ import NotificationService.repository.redis_db_repo.ActiveUserRepository;
 import NotificationService.response.ResponseMessage;
 import org.commonDTO.NotificationMessage;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
@@ -37,6 +38,15 @@ public class WSservice {
 
     @Autowired
     private ActiveUserRepository activeUserRepository;
+
+    @Autowired
+    private EmailService emailService;
+
+    @Value("${mail.notification.subject}")
+    private String emailSubject;
+
+    @Value("${mail.notification.greeting}")
+    private String emailGreeting;
 
     public void sendMessage(String message){
         GlobalNotification notification = GlobalNotification.builder()
@@ -72,6 +82,7 @@ public class WSservice {
 
                                 personalNotificationRepository.updateNotificationRow(finalPersonalNotification.getId(), user.getId());
                                 simpMessagingTemplate.convertAndSendToUser(user.getUsername(), "/topic/messages", responseMessage);
+                                emailService.sendEmail(emailSubject, emailGreeting, responseMessage.getContent(), user.getUsername());
                             }
                         });
 

@@ -4,6 +4,7 @@ import com.Core_Service.custom_exceptions.NoUserFoundException;
 import com.Core_Service.helpers.Helper;
 import com.Core_Service.model.User;
 import com.Core_Service.model.Viewer;
+import com.Core_Service.model_request.PrivateMessageRequest;
 import com.Core_Service.model_request.UserCreateRequest;
 import com.Core_Service.model_request.ViewerCreateRequest;
 import com.Core_Service.model_response.UserResponse;
@@ -19,6 +20,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -37,6 +39,9 @@ public class ViewerService {
     @Autowired
     private ViewerServiceCacheRepository cacheRepository;
 
+    @Autowired
+    private NotificationService notificationService;
+
     @Transactional
     public UserResponse createViewer(ViewerCreateRequest viewerCreateRequest){
         UserCreateRequest userCreateRequest = viewerCreateRequest.toUserCreateRequest();
@@ -48,6 +53,11 @@ public class ViewerService {
         viewerRepository.save(viewer);
 
         cacheRepository.clearCacheViewerList();
+
+        notificationService.notifyUsers(PrivateMessageRequest.builder()
+                .userIdList(Arrays.asList(user.getId()))
+                .content("Your account has been creates Successfully!!! \n With username: " + user.getUsername())
+                .build());
 
         return user.to(viewer);
     }

@@ -7,6 +7,7 @@ import com.Core_Service.helpers.Helper;
 import com.Core_Service.model.Episode;
 import com.Core_Service.model.Movie;
 import com.Core_Service.model.Series;
+import com.Core_Service.model_request.PrivateMessageRequest;
 import com.Core_Service.model_response.EpisodeResponse;
 import com.Core_Service.repository.db_repository.EpisodeRepository;
 import com.Core_Service.repository.db_repository.MovieRepository;
@@ -46,10 +47,16 @@ public class EpisodeService {
     @Autowired
     private EpisodeCacheRepository cacheRepository;
 
-    public EpisodeResponse createEpisodeForMovie(String episodeName, Long movieId) {
+    @Autowired
+    private NotificationService notificationService;
+
+    public EpisodeResponse createEpisodeForMovie(String episodeName, Long movieId) throws NoMovieFoundException {
+        Movie movie = movieRepository.findById(movieId)
+                .orElseThrow(() -> new NoMovieFoundException("No movie found with given id !!!"));
+
         Episode episode = Episode.builder().episodeName(episodeName)
                 .uniquePosterId(Helper.generateUUID())
-                .belongsToMovie(movieRepository.findById(movieId).get()).build();
+                .belongsToMovie(movie).build();
         episode = episodeRepository.save(episode);
 
         cacheRepository.deleteEpisodeCacheByEpisodeId(episode.getId());
@@ -63,6 +70,15 @@ public class EpisodeService {
                 .id(episode.getId()).uniquePosterId(episode.getUniquePosterId())
                 .movieId(episode.getBelongsToMovie().getId()).isNew(true).build();
         streamBridge.send("EpisodeCreationMessageTopic", episodeCreationMessage);
+
+        List<Long> viewerIds = movie.getViewers()
+                .stream()
+                .map(viewer -> viewer.getUser().getId())
+                .toList();
+        notificationService.notifyUsers(PrivateMessageRequest.builder()
+                .content("New Episode of Movie: " + movie.getName()
+                        + " has been uploaded !!!")
+                .userIdList(viewerIds).build());
 
         return episode.to();
     }
@@ -138,6 +154,15 @@ public class EpisodeService {
                                     .id(episode.getId()).uniquePosterId(episode.getUniquePosterId())
                                     .seriesId(episode.getBelongsToSeries().getId()).isNew(true).build()
         );
+
+        List<Long> viewerIds = series.getViewers()
+                .stream()
+                .map(viewer -> viewer.getUser().getId())
+                .toList();
+        notificationService.notifyUsers(PrivateMessageRequest.builder()
+                .content("New Episode of Series: " + series.getName()
+                        + " has been uploaded !!!")
+                .userIdList(viewerIds).build());
 
         return episode.to();
     }

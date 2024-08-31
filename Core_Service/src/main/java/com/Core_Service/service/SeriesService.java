@@ -7,6 +7,7 @@ import com.Core_Service.enums.Genre;
 import com.Core_Service.helpers.Helper;
 import com.Core_Service.helpers.StreamServiceDetails;
 import com.Core_Service.model.*;
+import com.Core_Service.model_request.PrivateMessageRequest;
 import com.Core_Service.model_request.ReviewCreateRequest;
 import com.Core_Service.model_request.SeriesCreateRequest;
 import com.Core_Service.model_response.ReviewResponse;
@@ -26,6 +27,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -48,6 +50,9 @@ public class SeriesService {
     
     @Autowired
     private UserRepository userRepository;
+
+    @Autowired
+    private NotificationService notificationService;
 
     public SeriesResponse addSeries(SeriesCreateRequest seriesCreateRequest) {
         Series series = Series.builder().name(seriesCreateRequest.getName())
@@ -76,6 +81,8 @@ public class SeriesService {
                 .rating(series.getRating() == null ? -1 : series.getRating())
                 .createdAt(series.getCreatedAt())
                 .build());
+
+        notificationService.notifyAllUsers("New series has been added, pay and watch " + series.getName() + " !!!");
 
         return series.to();
     }
@@ -175,6 +182,11 @@ public class SeriesService {
                         .seriesId(seriesId)
                         .isNew(true)
                         .build());
+
+        notificationService.notifyUsers(PrivateMessageRequest.builder()
+                .userIdList(Collections.singletonList(viewer.getUser().getId()))
+                .content("You have bought series: " + series.getName()
+                        + ". \nThanks for the purchase " + viewer.getName()).build());
 
         return "Bought series successfully !!!";
     }

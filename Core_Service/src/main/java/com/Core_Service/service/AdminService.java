@@ -5,6 +5,7 @@ import com.Core_Service.helpers.Helper;
 import com.Core_Service.model.Admin;
 import com.Core_Service.model.User;
 import com.Core_Service.model_request.AdminCreateRequest;
+import com.Core_Service.model_request.PrivateMessageRequest;
 import com.Core_Service.model_request.UserCreateRequest;
 import com.Core_Service.model_response.UserResponse;
 import com.Core_Service.repository.cache_repository.AdminServiceCacheRepository;
@@ -19,6 +20,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -37,6 +39,9 @@ public class AdminService {
     @Autowired
     private AdminServiceCacheRepository cacheRepository;
 
+    @Autowired
+    private NotificationService notificationService;
+
     @Transactional
     public UserResponse createAdmin(AdminCreateRequest adminCreateRequest){
         UserCreateRequest userCreateRequest = adminCreateRequest.toUserCreateRequest();
@@ -47,6 +52,11 @@ public class AdminService {
         adminRepository.save(admin);
 
         cacheRepository.clearCacheAdminList();
+
+        notificationService.notifyUsers(PrivateMessageRequest.builder()
+                .userIdList(Arrays.asList(user.getId()))
+                .content("Your account has been creates Successfully!!! \n With username: " + user.getUsername())
+                .build());
 
         return user.to(admin);
     }
