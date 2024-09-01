@@ -5,6 +5,7 @@ import NotificationService.config_jwt.JwtAuthenticationFilter;
 import NotificationService.enums.Authorities;
 import NotificationService.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -31,20 +32,22 @@ public class SecurityConfig {
     @Autowired
     private JwtAuthenticationFilter filter;
 
+    @Value("${allowed.origin}")
+    private String allowedOrigin;
+
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http.csrf().disable()
                 .cors(cors -> cors.configurationSource(request -> {
                     CorsConfiguration configuration = new CorsConfiguration();
-                    configuration.setAllowedOrigins(Arrays.asList("http://127.0.0.1:5500")); // Specify allowed origins
+                    configuration.setAllowedOrigins(Arrays.asList(allowedOrigin)); // Specify allowed origins
                     configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS")); // Allow all methods
-                    configuration.setAllowedHeaders(Arrays.asList("Authorization", "Content-Type")); // Allow all headers
+                    configuration.setAllowedHeaders(Arrays.asList("Authorization", "Range", "Content-Type")); // Allow all headers
                     configuration.setAllowCredentials(true); // Allow credentials
                     return configuration;}))
                 .authorizeHttpRequests()
-                .requestMatchers("/unseen/notifications").hasAuthority(Authorities.VIEWER.toString())
                 .requestMatchers("/ws/**").permitAll()
-                .anyRequest().permitAll()
+                .anyRequest().authenticated()
                 .and()
                 .exceptionHandling(ex -> ex.authenticationEntryPoint(point))
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))

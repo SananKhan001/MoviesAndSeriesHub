@@ -12,12 +12,12 @@
     <title>Reactive Spring Video Streaming</title>
 </head>
 <body>
+
 <div class="container mt-5">
     <h2>Video Streaming</h2>
     <video id="videoPlayer" width="720px" height="480px" controls preload="none">
         Your browser does not support the video tag.
     </video>
-    <img src="http://localhost:8082/poster/get/29f0080bdd97463ab0b67125cd4cb886" width="720px" height="480px">
 </div>
 
 <!-- Option 1: Bootstrap Bundle with Popper -->
@@ -26,8 +26,11 @@
         crossorigin="anonymous"></script>
 
 <script>
+    function getItem(key) {
+        return localStorage.getItem(key);
+    }
     document.addEventListener('DOMContentLoaded', function() {
-        const videoUrl = 'http://localhost:8082/series/stream/a5db28ff99844790838a461620fa59e7'; // Your video URL
+        const videoUrl = 'http://localhost:8082/poster/get/29f0080bdd97463ab0b67125cd4cb886'; // Your video URL
         const videoPlayer = document.getElementById('videoPlayer');
 
         // Fetch video with custom headers
@@ -36,7 +39,8 @@
                 const response = await fetch(url, {
                     method: 'GET',
                     headers: {
-                        "Authorization": "Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJhZG1pbkBnbWFpbC5jb20iLCJpYXQiOjE3MjMwNjgzMTUsImV4cCI6MTcyMzA3NTUxNX0.ubuWKtzY-eeMG5upS6fl3iaVO_sZLx989DELYKBLCBJcf7kKcAF5pFCHZTTU3gQQTV51qY5AnCoOCmSHUQqerA"
+                        "Authorization": "Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJhZG1pbjJAZ21haWwuY29tIiwiaWF0IjoxNzI1MjEyNDg0LCJleHAiOjE3MjUyMTk2ODR9.qX_YRp1DSydwAFuNwqPoF2D0fYdgNKEhqkq6MykT2YIUYCbwIqwfXBHhBvmaoVNp1OYNUpN1kUGMt_1MbaabNg",
+                        
                     }
                 });
 

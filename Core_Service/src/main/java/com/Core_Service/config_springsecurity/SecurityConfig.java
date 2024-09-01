@@ -4,6 +4,7 @@ import com.Core_Service.config_jwt.JwtAuthenticationEntryPoint;
 import com.Core_Service.config_jwt.JwtAuthenticationFilter;
 import com.Core_Service.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -27,17 +28,21 @@ public class SecurityConfig {
 
     @Autowired
     private JwtAuthenticationEntryPoint point;
+
     @Autowired
     private JwtAuthenticationFilter filter;
+
+    @Value("${allowed.origin}")
+    private String allowedOrigin;
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http.csrf().disable()
                 .cors(cors -> cors.configurationSource(request -> {
                     CorsConfiguration configuration = new CorsConfiguration();
-                    configuration.setAllowedOriginPatterns(Arrays.asList("*")); // Allows all origins with patterns
+                    configuration.setAllowedOrigins(Arrays.asList(allowedOrigin)); // Specify allowed origins
                     configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS")); // Allow all methods
-                    configuration.setAllowedHeaders(Arrays.asList("Authorization", "Content-Type")); // Allow all headers
+                    configuration.setAllowedHeaders(Arrays.asList("Authorization", "Range", "Content-Type")); // Allow all headers
                     configuration.setAllowCredentials(true); // Allow credentials
                     return configuration;}))
                 .authorizeHttpRequests()

@@ -84,12 +84,12 @@ public class MediaController {
     }
 
     @GetMapping("/movie/stream/{uniqueId}")
-    public Mono<ResponseEntity<Resource>> streamMovieVideo(@PathVariable("uniqueId") String uniqueId, @RequestHeader("Range") String range) throws IOException {
+    public Mono<ResponseEntity<Resource>> streamMovieVideo(@PathVariable("uniqueId") String uniqueId, @RequestHeader String range) throws IOException {
         return mediaFileService.getMovieVideo(uniqueId, range);
     }
 
     @GetMapping("/series/stream/{uniqueId}")
-    public Mono<ResponseEntity<Resource>> streamSeriesVideo(@PathVariable("uniqueId") String uniqueId, @RequestHeader("Range") String range) throws IOException {
+    public Mono<ResponseEntity<Resource>> streamSeriesVideo(@PathVariable("uniqueId") String uniqueId, @RequestHeader String range) throws IOException {
         return mediaFileService.getSeriesVideo(uniqueId, range);
     }
 

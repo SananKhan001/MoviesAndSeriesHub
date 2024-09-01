@@ -4,6 +4,7 @@ import com.Stream_Service.config_jwt.AuthConverter;
 import com.Stream_Service.config_jwt.AuthManager;
 import com.Stream_Service.enums.Authority;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
@@ -16,12 +17,18 @@ import org.springframework.security.core.userdetails.MapReactiveUserDetailsServi
 import org.springframework.security.core.userdetails.ReactiveUserDetailsService;
 import org.springframework.security.web.server.SecurityWebFilterChain;
 import org.springframework.security.web.server.authentication.AuthenticationWebFilter;
+import org.springframework.web.cors.CorsConfiguration;
+
+import java.util.Arrays;
 
 @EnableWebFluxSecurity
 @Configuration
 public class SecurityConfig {
     @Autowired
     private ReactiveUserDetailsService userDetailsService;
+
+    @Value("${allowed.origin}")
+    private String allowedOrigin;
 
     @Bean
     public SecurityWebFilterChain springSecurityFilterChain(ServerHttpSecurity http, AuthConverter jwtAuthConverter, AuthManager jwtAuthManager) {
@@ -39,7 +46,14 @@ public class SecurityConfig {
                 .addFilterAt(jwtFilter, SecurityWebFiltersOrder.AUTHENTICATION)
                 .httpBasic().disable()
                 .formLogin().disable()
-                .csrf().disable();
+                .csrf().disable()
+                .cors(cors -> cors.configurationSource(request -> {
+                    CorsConfiguration configuration = new CorsConfiguration();
+                    configuration.setAllowedOrigins(Arrays.asList(allowedOrigin, "http://127.0.0.1:5501")); // Specify allowed origins
+                    configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS")); // Allow all methods
+                    configuration.setAllowedHeaders(Arrays.asList("Authorization", "Range", "Content-Type")); // Allow all headers
+                    configuration.setAllowCredentials(true); // Allow credentials
+                    return configuration;}));
 
         return http.build();
     }
