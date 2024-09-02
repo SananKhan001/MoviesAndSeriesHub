@@ -49,7 +49,7 @@ public class SecurityConfig {
                 .csrf().disable()
                 .cors(cors -> cors.configurationSource(request -> {
                     CorsConfiguration configuration = new CorsConfiguration();
-                    configuration.setAllowedOrigins(Arrays.asList(allowedOrigin, "http://127.0.0.1:5501")); // Specify allowed origins
+                    configuration.setAllowedOrigins(Arrays.asList(allowedOrigin)); // Specify allowed origins
                     configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS")); // Allow all methods
                     configuration.setAllowedHeaders(Arrays.asList("Authorization", "Range", "Content-Type")); // Allow all headers
                     configuration.setAllowCredentials(true); // Allow credentials

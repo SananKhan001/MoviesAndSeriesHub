@@ -42,8 +42,8 @@ public class User implements UserDetails, Serializable {
     @JsonIgnore
     @JoinTable(
             name = "personal_notification_mapping",
-            joinColumns = @JoinColumn(name = "notification_id", referencedColumnName = "id"),
-            inverseJoinColumns = @JoinColumn(name = "user_id", referencedColumnName = "id")
+            joinColumns = @JoinColumn(name = "user_id", referencedColumnName = "id"),
+            inverseJoinColumns = @JoinColumn(name = "notification_id", referencedColumnName = "id")
     )
     private List<PersonalNotification> personalNotifications;
 

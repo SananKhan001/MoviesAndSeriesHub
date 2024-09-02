@@ -103,9 +103,14 @@ type TransactionResponse {
 
 type Mutation{
     # To create an ADMIN-ACCOUNT [Accessible by EVERYONE]
-    signUpAdmin(adminCreateRequest:AdminCreateRequest!):UserResponse
-    # To create a VIEWER-ACCOUNT [Only accessible by VIEWER]
-    signUpViewer(viewerCreateRequest:ViewerCreateRequest!):UserResponse
+    signUpAdmin(adminCreateRequest:AdminCreateRequest!):Boolean
+    # To create a VIEWER-ACCOUNT [Accessible by EVERYONE]
+    signUpViewer(viewerCreateRequest:ViewerCreateRequest!):Boolean
+    # To verify OTP of ADMIN-ACCOUNT
+    verifyOtpAdmin(otp:String!):UserResponse
+    # To verify OTP of VIEWER-ACCOUNT
+    verifyOtpViewer(otp:String!):UserResponse
+
     # To perform ADD operation on movies [Only accessible by ADMIN]
     addMovie(movieCreateRequest:MovieCreateRequest!):MovieResponse
     # To perform UPDATE operation on movies [Only accessible by ADMIN]
@@ -139,6 +144,8 @@ type Mutation{
     notifyAllUsers(message:String!):Boolean
     # To Send Notification To Listed Users [Only accessible by ADMIN]
     notifyUsers(message:PrivateMessageRequest!):Boolean
+
+
 }
 
 type Query{

@@ -10,11 +10,13 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.io.Serializable;
+
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-public class AdminCreateRequest {
+public class AdminCreateRequest implements Serializable {
     @NotNull(message = "username should not be null")
     @NotBlank(message = "username should not be blank")
     private String name;

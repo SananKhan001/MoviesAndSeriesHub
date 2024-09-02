@@ -10,7 +10,9 @@ org/commonDTO/UserCreationMessage$UserCreationMessageBuilder.class
 org/commonDTO/TransactionDetails.class
 org/commonDTO/EpisodeCreationMessage$EpisodeCreationMessageBuilder.class
 org/commonDTO/SeriesCreationMessage.class
+org/commonDTO/OtpNotificationMessage$OtpNotificationMessageBuilder.class
 org/commonDTO/MovieCreationMessage$MovieCreationMessageBuilder.class
+org/commonDTO/OtpNotificationMessage.class
 org/commonDTO/UserCreationMessage.class
 org/commonDTO/NotificationMessage.class
 org/commonDTO/MovieBuyMessage.class

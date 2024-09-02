@@ -26,10 +26,13 @@ public class CacheManagerConfig {
     private String userDetailsTTL;
 
     @Value("${redis.ttl.admin_service_cache}")
-    private String adminServiceCache;
+    private String adminServiceCacheTTL;
 
     @Value("${redis.ttl.viewer_service_cache}")
-    private String viewerServiceCache;
+    private String viewerServiceCacheTTL;
+
+    @Value("${redis.ttl.otp_cache}")
+    private String otpCacheTTL;
 
     @Value("${redis.ttl.default}")
     private String defaultTTL;
@@ -52,10 +55,13 @@ public class CacheManagerConfig {
                                 .entryTtl(Duration.ofMinutes(Long.parseLong(userDetailsTTL))))
                 .withCacheConfiguration("admin_service_cache",
                         RedisCacheConfiguration.defaultCacheConfig()
-                                .entryTtl(Duration.ofMinutes(Long.parseLong(adminServiceCache))))
+                                .entryTtl(Duration.ofMinutes(Long.parseLong(adminServiceCacheTTL))))
                 .withCacheConfiguration("viewer_service_cache",
                         RedisCacheConfiguration.defaultCacheConfig()
-                                .entryTtl(Duration.ofMinutes(Long.parseLong(viewerServiceCache))))
+                                .entryTtl(Duration.ofMinutes(Long.parseLong(viewerServiceCacheTTL))))
+                .withCacheConfiguration("otp_cache",
+                        RedisCacheConfiguration.defaultCacheConfig()
+                                .entryTtl(Duration.ofMinutes(Long.parseLong(otpCacheTTL))))
                 .cacheDefaults(RedisCacheConfiguration.defaultCacheConfig()
                         .entryTtl(Duration.ofMinutes(Long.parseLong(defaultTTL))))
                 .build();

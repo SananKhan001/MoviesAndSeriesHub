@@ -7,11 +7,13 @@ import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;
 import lombok.*;
 
+import java.io.Serializable;
+
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-public class ViewerCreateRequest {
+public class ViewerCreateRequest implements Serializable {
 
     @NotNull(message = "username should not be null")
     @NotBlank(message = "username should not be blank")

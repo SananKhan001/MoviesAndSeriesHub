@@ -46,6 +46,7 @@ public class SecurityConfig {
                     configuration.setAllowCredentials(true); // Allow credentials
                     return configuration;}))
                 .authorizeHttpRequests()
+                .requestMatchers("/notification/**").authenticated()
                 .requestMatchers("/ws/**").permitAll()
                 .anyRequest().authenticated()
                 .and()

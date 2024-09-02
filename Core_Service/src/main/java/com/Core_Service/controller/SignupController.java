@@ -3,6 +3,7 @@ package com.Core_Service.controller;
 import com.Core_Service.model_request.AdminCreateRequest;
 import com.Core_Service.model_request.ViewerCreateRequest;
 import com.Core_Service.model_response.UserResponse;
+import com.Core_Service.service.AccountCreationService;
 import com.Core_Service.service.AdminService;
 import com.Core_Service.service.ViewerService;
 import jakarta.validation.Valid;
@@ -18,19 +19,26 @@ import org.springframework.web.bind.annotation.RestController;
 public class SignupController {
 
     @Autowired
-    private AdminService adminService;
-
-    @Autowired
-    private ViewerService viewerService;
+    private AccountCreationService accountCreationService;
 
     @MutationMapping(name = "signUpAdmin")
-    public UserResponse signUpAdmin(@Argument @Valid AdminCreateRequest adminCreateRequest) {
-        return adminService.createAdmin(adminCreateRequest);
+    public Boolean signUpAdmin(@Argument @Valid AdminCreateRequest adminCreateRequest) {
+        return accountCreationService.generateAdminCreateRequest(adminCreateRequest);
     }
 
     @MutationMapping(name = "signUpViewer")
-    public UserResponse signUpViewer(@Argument @Valid ViewerCreateRequest viewerCreateRequest) {
-        return viewerService.createViewer(viewerCreateRequest);
+    public Boolean signUpViewer(@Argument @Valid ViewerCreateRequest viewerCreateRequest) {
+        return accountCreationService.generateViewerCreateRequest(viewerCreateRequest);
+    }
+
+    @MutationMapping(name = "verifyOtpAdmin")
+    public UserResponse verifyOtpAdmin(@Argument String otp) {
+        return accountCreationService.verifyOtpAdmin(otp);
+    }
+
+    @MutationMapping(name = "verifyOtpViewer")
+    UserResponse verifyOtpViewer(@Argument String otp) {
+        return accountCreationService.verifyOtpViewer(otp);
     }
 
 }

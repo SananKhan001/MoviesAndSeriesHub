@@ -17,15 +17,7 @@ import java.util.Set;
 public class MessageController {
 
     @Autowired
-    private ActiveUserRepository activeUserRepository;
-
-    @Autowired
     private WSservice wSservice;
-
-    @GetMapping
-    public Set<Long> getActiveUserSet(){
-        return activeUserRepository.getActiveUsersSet();
-    }
 
     @MessageMapping("/unseen/notifications")
     public ResponseEntity unseenNotifications(Principal principal) {

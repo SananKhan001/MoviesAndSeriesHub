@@ -2,6 +2,7 @@
 /home/sanan/Desktop/MoviesAndSeriesHub/CommonDTO/src/main/java/org/commonDTO/MovieBuyMessage.java
 /home/sanan/Desktop/MoviesAndSeriesHub/CommonDTO/src/main/java/org/commonDTO/MovieCreationMessage.java
 /home/sanan/Desktop/MoviesAndSeriesHub/CommonDTO/src/main/java/org/commonDTO/NotificationMessage.java
+/home/sanan/Desktop/MoviesAndSeriesHub/CommonDTO/src/main/java/org/commonDTO/OtpNotificationMessage.java
 /home/sanan/Desktop/MoviesAndSeriesHub/CommonDTO/src/main/java/org/commonDTO/SeriesBuyMessage.java
 /home/sanan/Desktop/MoviesAndSeriesHub/CommonDTO/src/main/java/org/commonDTO/SeriesCreationMessage.java
 /home/sanan/Desktop/MoviesAndSeriesHub/CommonDTO/src/main/java/org/commonDTO/TransactionDetails.java

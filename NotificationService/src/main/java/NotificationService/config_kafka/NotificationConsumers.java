@@ -36,7 +36,9 @@ public class NotificationConsumers {
 
     @Bean
     public Consumer<NotificationMessage> privateNotificationConsumer() {
-        return notification -> wSservice.sendUser(notification);
+        return notification -> {
+            wSservice.sendUser(notification);
+        };
     }
 
     @Bean

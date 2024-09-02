@@ -61,7 +61,9 @@ public class WSservice {
 
         PersonalNotification personalNotification = PersonalNotification.builder()
                 .content(message.getContent()).build();
+
         PersonalNotification finalPersonalNotification = personalNotificationRepository.save(personalNotification);
+
         ResponseMessage responseMessage = ResponseMessage.builder()
                 .content(finalPersonalNotification.getContent())
                 .date(finalPersonalNotification.getCreationTime()).build();
@@ -80,7 +82,6 @@ public class WSservice {
                                     activeUserRepository.setUnseenNotifications(user.getUsername(), messageList);
                                 }
 
-                                personalNotificationRepository.updateNotificationRow(finalPersonalNotification.getId(), user.getId());
                                 simpMessagingTemplate.convertAndSendToUser(user.getUsername(), "/topic/messages", responseMessage);
                                 emailService.sendEmail(emailSubject, emailGreeting, responseMessage.getContent(), user.getUsername());
                             }
