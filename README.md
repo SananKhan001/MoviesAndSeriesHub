@@ -38,7 +38,7 @@ Messaging: Apache Kafka (with Spring Cloud Stream).
 Payment: Razorpay.
 Reactive Programming: Spring WebFlux.
 Serverless Architecture: Spring Cloud Functions.
-Real-time Communication: WebSocket.
+Real-time Communication: WebSocket, Spring Mail.
 ```
 
 ![](./project_architecture.png)
