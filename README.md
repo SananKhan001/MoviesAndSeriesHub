@@ -2,7 +2,7 @@
 
 #### Welcome to MovieAndSeriesHub, a comprehensive platform for managing and streaming movies and series. This project provides a seamless experience for users to discover, purchase, and watch movies and series with a straightforward pay-per-view model.
 
-## Project Architecture
+## 🚀 Project Architecture
 ```text
 MovieAndSeriesHub is designed to offer a modern, scalable, and efficient media streaming service. The application is 
 built using a microservices architecture, allowing for flexibility and scalability across various components. Here's 
